@@ -13,6 +13,8 @@
     <version>0.0.1-SNAPSHOT</version>
     <name>gmall-parent</name>
     <description>父工程，用来进行依赖管理</description>
+    <packaging>pome</packaging>
+
 
     <properties>
         <java.version>1.8</java.version>
