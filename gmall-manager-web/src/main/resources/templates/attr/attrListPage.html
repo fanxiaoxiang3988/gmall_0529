@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>主界面</title>
+</head>
+<body >
+
+<div class="easyui-panel" title=""  data-options="border:true">
+
+    <!--表格-->
+    <table id="attrInfoTable" class="easyui-datagrid" title="属性列表"
+           data-options="singleSelect:true,method:'get' ,toolbar:'#tb'">
+        <thead>
+        <tr>
+            <th data-options="field:'id',width:100">属性id </th>
+            <th data-options="field:'attrName',width:300">属性名</th>
+          </tr>
+        </thead>
+    </table>
+    <!--表格的工具栏-->
+    <div id="tb" style="padding:5px;height:auto">
+        <div style="margin-bottom:5px">
+            <a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="addAttrInfo()">添加</a>
+            <a href="#" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="editAttrInfo()">编辑</a>
+            <a href="#" class="easyui-linkbutton" iconCls="icon-remove" plain="true">删除</a>
+        </div>
+        <div>
+            <!--三级联动效果-->
+            一级分类：
+            <select id="ctg1ForAttrList" class="easyui-combobox" style="width:100px"
+                    data-options="valueField: 'id',textField: 'name',url: 'basecatalog/1/list.json',
+                    onSelect: function(rec){
+                    //刷新二级分类内容
+                    $('#ctg2ForAttrList').combobox('reload', 'basecatalog/2/list.json?id='+rec.id);
+                    //清除二级分类和三级分类的选项框中选择的内容
+                    $('#ctg2ForAttrList').combobox('clear');
+                    $('#ctg3ForAttrList').combobox('clear');
+                }" ></select>
+            二级分类：
+            <select id="ctg2ForAttrList" name="ctg2ForAttrList" class="easyui-combobox" style="width:100px"
+                    data-options="valueField: 'id',textField: 'name',onSelect: function(rec){
+                    //刷新三级分类内容
+                    $('#ctg3ForAttrList').combobox('reload', 'basecatalog/3/list.json?id='+rec.id);
+                    //清除三级分类的选项框中选择的内容
+                    $('#ctg3ForAttrList').combobox('clear');
+                }"></select>
+            三级分类：
+            <select id="ctg3ForAttrList" name="ctg3ForAttrList" class="easyui-combobox" style="width:100px"
+                    data-options="valueField: 'id',textField: 'name',
+                    //获取当前分类下的所有平台属性的列表
+                     onSelect: function(rec){
+                     $('#attrInfoTable').datagrid({
+                        url:'basecatalog/attrs.json?id='+rec.id
+                        });
+                }"></select>
+
+               <a href="#" onclick="refreshTable()" class="easyui-linkbutton" iconCls="icon-search">刷新属性列表</a>
+        </div>
+    </div>
+</div>
+    <!--引入其他页面  jsp:include
+            th:include=""里面写视图名(和Controller相同)：将目标内容引入进来
+            -->
+    <div th:include="attr/attrEdit"></div>
+</body>
+
+<script language="javascript">
+
+    /**
+     * 刷新表格
+     */
+    function refreshTable() {
+        //获取到当前选中的三级分类的id
+        var c3id = $('#ctg3ForAttrList').combo('getValue');
+        //重新加载attrInfoTable表格内的数据
+        $('#attrInfoTable').datagrid({
+            url:'basecatalog/attrs.json?id='+c3id
+        });
+    }
+
+    /**
+     * 添加attrInfo的信息
+     */
+    function addAttrInfo() {
+        //确认三级分类是否被选中
+        if(getCatalog3Info() != null) {
+            $("#attrDlg").dialog('open');
+        } else {
+            $.messager.alert('警告','请先选择三级分类');
+        }
+    }
+
+    /**
+     * 编辑attrInfo属性
+     */
+    function editAttrInfo() {
+        //确认三级分类是否被选中
+        if(getCatalog3Info() != null) {
+            var attrInfo = getAttrInfo();
+            //console.log(attrInfo);
+            //{id: 1, attrName: "励志读物", catalog3Id: 1}
+            //确认是否选择平台属性
+            if(attrInfo == null) {
+                $.messager.alert('警告','请先选择平台属性');
+            } else {
+                //1、弹出对话框
+                $("#attrDlg").dialog('open');
+                //2、回显平台属性名
+                $("#attrId").val(attrInfo.id);
+                $("#attrName").textbox('setValue',attrInfo.attrName);
+                //3、刷新平台属性的属性值列表
+                $('#attrInfoValueTable').datagrid({
+                    url:'attr/value/'+attrInfo.id,
+                    singleSelect:true,
+                    //注：写onClickCell是引用该方法，而onClickCell()是调用该方法，需注意
+                    onDblClickCell:onClickCell,
+                    columns:[[
+                        {field:'id',title:'属性值id',width:100},
+                        //设置允许修改的单元格
+                        {field:'valueName',title:'属性值名称',width:100,
+                            editor: {
+                                type: 'validatebox', options: { required: true}  //必填项
+                                //options指的是对这个type组件的设置
+                                //type：能写的值就是form里面的表单组件名
+                                //options：能写的值就是表单组件的data-options设置项
+                            }},
+                    ]],
+                    toolbar: [{
+                        text:'添加',
+                        iconCls: 'icon-add',
+                        handler: function(){
+
+                        }
+                    },'-',{
+                        text:'删除',
+                        iconCls: 'icon-remove',
+                        handler: function(){
+
+                        }
+                    }]
+                });
+
+            }
+        } else {
+            $.messager.alert('警告','请先选择三级分类');
+        }
+    }
+
+    /**
+     * 返回所选中的三级分类的信息，未选择则返回null
+     */
+    function getCatalog3Info() {
+        var id = $("#ctg3ForAttrList").combobox('getValue');
+        var text = $("#ctg3ForAttrList").combobox('getText');
+        var info = {id:id,name:text};
+        if(id == "") {
+            return null;
+        } else {
+            return info;
+        }
+    }
+
+    /**
+     * 返回所选中的平台属性的信息
+     */
+    function getAttrInfo() {
+        return $('#attrInfoTable').datagrid('getSelected');
+    }
+
+</script>
+
+</html>
