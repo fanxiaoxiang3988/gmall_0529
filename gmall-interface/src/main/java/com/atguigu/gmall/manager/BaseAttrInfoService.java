@@ -24,4 +24,5 @@ public interface BaseAttrInfoService {
      */
     public List<BaseAttrValue> getBaseAttrValueByAttrId(Integer baseAttrInfoId);
 
+    void saveOrUpdateBaseInfo(BaseAttrInfo baseAttrInfo);
 }

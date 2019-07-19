@@ -79,6 +79,7 @@
         });
     }
 
+
     /**
      * 添加attrInfo的信息
      */
@@ -129,18 +130,28 @@
                     toolbar: [{
                         text:'添加',
                         iconCls: 'icon-add',
+                        //回调函数
                         handler: function(){
-
+                            $('#attrInfoValueTable').datagrid('appendRow',{
+                                id: '',
+                                valueName: '',
+                                attrId: getAttrInfo().id
+                            });
                         }
                     },'-',{
                         text:'删除',
                         iconCls: 'icon-remove',
                         handler: function(){
-
+                            //返回当前行的数据
+                            var data = $('#attrInfoValueTable').datagrid('getSelected');
+                            //console.log(data);{id: 1, valueName: "名人传", attrId: 1}
+                            //获取当前行的索引
+                            var index = $('#attrInfoValueTable').datagrid('getRowIndex',data);
+                            //删除指定行
+                            $('#attrInfoValueTable').datagrid('deleteRow',index);
                         }
                     }]
                 });
-
             }
         } else {
             $.messager.alert('警告','请先选择三级分类');

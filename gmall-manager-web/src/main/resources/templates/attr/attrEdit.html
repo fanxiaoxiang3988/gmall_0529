@@ -20,14 +20,51 @@
     </div>
 
     <div id="bb">
-        <a href="#" class="easyui-linkbutton" >保存</a>
+        <a href="#" class="easyui-linkbutton" onclick="saveAttrInfoAndValue()">保存</a>
         <a href="#" class="easyui-linkbutton" onclick="$('#attrDlg').dialog('close')" >关闭</a>
     </div>
 </body>
 
-<script language="JavaScript">
+<script language="javascript">
 
-    //双击编辑功能
+    /**
+     * 保存属性名及其对应的的属性值，牵扯到增删改
+     */
+    function saveAttrInfoAndValue() {
+        //定义一个js对象，其中的内容按照BaseAttrInfoAndValueVO格式存储
+        var attrInfoAndValue = {}
+        //获取平台属性
+        attrInfoAndValue.id = $("#attrId").val();
+        attrInfoAndValue.attrName = $("#attrName").textbox('getValue');
+        //获取平台属性值
+        attrInfoAndValue.attrValues = $("#attrInfoValueTable").datagrid('getRows');
+        //将js对象转为json字符串
+        var jsonStr = JSON.stringify(attrInfoAndValue)
+        //console.log(jsonStr);
+        //发送请求去mvc执行此次增删改操作
+        $.ajax({
+            url: 'attr/updates',
+            type: 'post',
+            dateType: 'json',
+            contentType: 'application/json',
+            data: jsonStr,
+            processData:false,//不默认处理数据，否则数据就变成了k=v方式
+            success: function (data) {
+                //提示成功，关闭弹框，刷新表格
+                $("#attrDlg").dialog('close');
+                refreshTable();
+                $.messager.alert("成功","数据保存成功");
+            },
+            error: function () {
+                //提示错误
+                alert("编辑失败...");
+            }
+        })
+    }
+
+    /**
+     * 双击编辑功能
+     */
     var editIndex = undefined;
     function endEditing(){
         if (editIndex == undefined){return true}
