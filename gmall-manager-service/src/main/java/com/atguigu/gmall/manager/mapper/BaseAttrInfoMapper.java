@@ -9,4 +9,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @date 2019/7/16 0016
  */
 public interface BaseAttrInfoMapper extends BaseMapper<BaseAttrInfo> {
+
+    int insertNewInfo(BaseAttrInfo info);
 }

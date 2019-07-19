@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<!--closed="true"使这个弹出框是关闭的，弹出框里面嵌套表格，buttons：对话框窗口底部按钮-->
+<div id="attrAddDlg" class="easyui-dialog" title="编辑属性" style="width:600px;height:500px;"
+     closed="true" data-options="iconCls:'icon-save',resizable:true,modal:true" buttons="#bb" >
+    <form id="attrForm">
+        <br/>
+        <label>属性名称:</label>
+        <input  id="addAttrName" name="attrName" class="easyui-textbox" data-options="" style="width:100px"/>
+        <input  id="addAttrId" name="id" type="hidden"  />
+        <input  id="catalog3Id" name="catalog3Id" type="hidden"/>
+        <br/><br/>
+        <!--平台属性值的列表-->
+        <table id="addAttrInfoValueTable" class="easyui-datagrid" title="属性值列表"></table>
+    </form>
+</div>
+
+<div id="bb">
+    <a href="#" class="easyui-linkbutton" onclick="saveNew()">保存</a>
+    <a href="#" class="easyui-linkbutton" onclick="$('#attrAddDlg').dialog('close')" >关闭</a>
+</div>
+</body>
+
+<script language="javascript">
+
+    /**
+     * 新增新的平台属性以及平台属性值的信息
+     */
+    function saveNew() {
+        alert($("#catalog3Id").val());
+
+        //定义一个js对象，其中的内容按照BaseAttrInfoAndValueVO格式存储
+        var attrInfoAndValue = {}
+        //获取平台属性
+        attrInfoAndValue.attrName = $("#addAttrName").textbox('getValue');
+        attrInfoAndValue.catalog3Id = $("#catalog3Id").val();
+        //获取平台属性值
+        attrInfoAndValue.attrValues = $("#addAttrInfoValueTable").datagrid('getRows');
+        //将js对象转为json字符串
+        var jsonStr = JSON.stringify(attrInfoAndValue)
+        //console.log(jsonStr);
+        //发送请求去mvc执行此次增删改操作
+        $.ajax({
+            url: 'attr/updates',
+            type: 'post',
+            dateType: 'json',
+            contentType: 'application/json',
+            data: jsonStr,
+            processData:false,//不默认处理数据，否则数据就变成了k=v方式
+            success: function (data) {
+                //提示成功，关闭弹框，刷新表格
+                $("#attrAddDlg").dialog('close');
+                refreshTable();
+                $.messager.alert("成功","添加成功");
+            },
+            error: function () {
+                //提示错误
+                alert("编辑失败...");
+            }
+        })
+    }
+
+    var editIndex = undefined;
+    function endEditingAdd(){
+        if (editIndex == undefined){return true}
+        if ($('#addAttrInfoValueTable').datagrid('validateRow', editIndex)){
+            $('#addAttrInfoValueTable').datagrid('endEdit', editIndex);
+            editIndex = undefined;
+            return true;
+        } else {
+            return false;
+        }
+    }
+    function onClickCellAdd(index, field){
+        if (endEditingAdd()){
+            $('#addAttrInfoValueTable').datagrid('selectRow', index)
+                .datagrid('editCell', {index:index,field:field});
+            editIndex = index;
+        }
+    }
+
+</script>
+</html>

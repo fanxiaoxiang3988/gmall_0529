@@ -23,7 +23,7 @@
         <div style="margin-bottom:5px">
             <a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="addAttrInfo()">添加</a>
             <a href="#" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="editAttrInfo()">编辑</a>
-            <a href="#" class="easyui-linkbutton" iconCls="icon-remove" plain="true">删除</a>
+            <a href="#" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="deleteAttrInfoAndValue()">删除</a>
         </div>
         <div>
             <!--三级联动效果-->
@@ -63,6 +63,7 @@
             th:include=""里面写视图名(和Controller相同)：将目标内容引入进来
             -->
     <div th:include="attr/attrEdit"></div>
+    <div th:include="attr/attrAdd"></div>
 </body>
 
 <script language="javascript">
@@ -86,7 +87,45 @@
     function addAttrInfo() {
         //确认三级分类是否被选中
         if(getCatalog3Info() != null) {
-            $("#attrDlg").dialog('open');
+
+            $("#catalog3Id").val(getCatalog3Info().id);
+
+            $("#attrAddDlg").dialog('open');
+            $('#addAttrInfoValueTable').datagrid({
+                singleSelect:true,
+                onDblClickCell:onClickCellAdd,
+                columns:[[
+                    {field:'id',title:'属性值id',width:100},
+                    //设置允许修改的单元格
+                    {field:'valueName',title:'属性值名称',width:100,
+                        editor: {
+                            type: 'validatebox', options: { required: true}  //必填项
+                        }},
+                ]],
+                toolbar: [{
+                    text:'添加',
+                    iconCls: 'icon-add',
+                    //回调函数
+                    handler: function(){
+                        $('#addAttrInfoValueTable').datagrid('appendRow',{
+                            id: '',
+                            valueName: ''
+                        });
+                    }
+                },'-',{
+                    text:'删除',
+                    iconCls: 'icon-remove',
+                    handler: function(){
+                        //返回当前行的数据
+                        var data = $('#addAttrInfoValueTable').datagrid('getSelected');
+                        //console.log(data);{id: 1, valueName: "名人传", attrId: 1}
+                        //获取当前行的索引
+                        var index = $('#addAttrInfoValueTable').datagrid('getRowIndex',data);
+                        //删除指定行
+                        $('#addAttrInfoValueTable').datagrid('deleteRow',index);
+                    }
+                }]
+            });
         } else {
             $.messager.alert('警告','请先选择三级分类');
         }
@@ -157,6 +196,43 @@
             $.messager.alert('警告','请先选择三级分类');
         }
     }
+
+    /**
+     * 删除所选中的平台属性以及其名下的所有平台属性值
+     */
+    function deleteAttrInfoAndValue() {
+        //确认是否选择三级分类
+        if(getCatalog3Info() != null) {
+            var attrInfo = getAttrInfo();
+            //console.log(attrInfo);
+            //{id: 1, attrName: "励志读物", catalog3Id: 1}
+            //确认是否选择平台属性
+
+            if(attrInfo == null) {
+                $.messager.alert('警告','请选择需要删除的平台属性');
+            } else {
+                // var data = {id:attrInfo.id}
+                // var dataStr = JSON.stringify(data)
+                $.ajax({
+                    url: 'attr/deleteAttrInfoAndValue',
+                    type: 'post',
+                    dateType: 'json',
+                    data: {"id":attrInfo.id},
+                    success: function (data) {
+                        refreshTable();
+                        $.messager.alert("成功","删除成功");
+                    },
+                    error: function () {
+                        alert("删除失败...");
+                    }
+                })
+            }
+        } else {
+            $.messager.alert('警告','请先选择三级分类');
+        }
+    }
+
+
 
     /**
      * 返回所选中的三级分类的信息，未选择则返回null

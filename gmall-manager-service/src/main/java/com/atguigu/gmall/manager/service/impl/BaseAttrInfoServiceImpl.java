@@ -4,8 +4,10 @@ import com.alibaba.dubbo.config.annotation.Service;
 import com.atguigu.gmall.manager.BaseAttrInfo;
 import com.atguigu.gmall.manager.BaseAttrInfoService;
 import com.atguigu.gmall.manager.BaseAttrValue;
+import com.atguigu.gmall.manager.BaseCatalog3;
 import com.atguigu.gmall.manager.mapper.BaseAttrInfoMapper;
 import com.atguigu.gmall.manager.mapper.BaseAttrValueMapper;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +49,7 @@ public class BaseAttrInfoServiceImpl implements BaseAttrInfoService {
     @Transactional
     @Override
     public void saveOrUpdateBaseInfo(BaseAttrInfo baseAttrInfo) {
-        log.info("准备修改的BaseAttrInfo信息是：{},没有id？{}",baseAttrInfo,baseAttrInfo.getId());
+        //log.info("准备修改的BaseAttrInfo信息是：{},没有id？{}",baseAttrInfo,baseAttrInfo.getId());
         //根据传来的baseAttrInfo判断是修改还是添加
         if(baseAttrInfo.getId() != null) {
             //修改基本属性名
@@ -80,7 +82,34 @@ public class BaseAttrInfoServiceImpl implements BaseAttrInfoService {
             }
         } else {
             //添加
+            BaseAttrInfo info = new BaseAttrInfo();
+            info.setAttrName(baseAttrInfo.getAttrName());
+            info.setCatalog3Id(baseAttrInfo.getCatalog3Id());
+            //添加平台属性
+            baseAttrInfoMapper.insertNewInfo(info);
+            //log.info("数据插入成功，插入的平台属性，其id是：{}",info.getId());
+            //添加平台属性值
+            List<BaseAttrValue> attrValues = baseAttrInfo.getAttrValues();
+            for (BaseAttrValue attrValue : attrValues) {
+                if(info.getId() != null) {
+                    attrValue.setAttrId(info.getId());
+                    baseAttrValueMapper.insert(attrValue);
+                }
+            }
         }
+    }
+
+    @Override
+    public int deleteAttrInfoById(Integer id) {
+
+        return baseAttrInfoMapper.deleteById(id);
+    }
+
+    @Override
+    public int deleteAttrValueInfoById(Integer id) {
+        QueryWrapper<BaseAttrValue> wrapper = new QueryWrapper<>();
+        wrapper.eq("attr_id", id);
+        return baseAttrValueMapper.delete(wrapper);
     }
 
 }

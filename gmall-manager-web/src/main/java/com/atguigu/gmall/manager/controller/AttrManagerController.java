@@ -9,10 +9,7 @@ import com.atguigu.gmall.manager.vo.BaseAttrValueVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +26,7 @@ public class AttrManagerController {
 
     @Reference
     private BaseAttrInfoService baseAttrInfoService;
+
 
     /**
      * 去平台属性列表页面
@@ -66,9 +64,8 @@ public class AttrManagerController {
     @ResponseBody
     @RequestMapping("/updates")
     public String saveOrUpdateOrDeleteAttrInfoAndValue(@RequestBody BaseAttrInfoAndValueVO baseAttrInfoAndValueVO) {
-        //log.info("页面所传参数为：{}",baseAttrInfoAndValueVO);
+        log.info("页面所传参数为：{}",baseAttrInfoAndValueVO);
         //判断是修改还是添加
-        if(baseAttrInfoAndValueVO.getId() != null) {
             //修改
             BaseAttrInfo baseAttrInfo = new BaseAttrInfo();
             //将vo中的所有属性复制到bean中
@@ -83,9 +80,24 @@ public class AttrManagerController {
             }
             baseAttrInfo.setAttrValues(values);
             baseAttrInfoService.saveOrUpdateBaseInfo(baseAttrInfo);
-        } else {
-            //添加
-        }
+        return "ok";
+    }
+
+    @ResponseBody
+    @RequestMapping("/deleteAttrInfoAndValue")
+    public String deleteAttrInfoAndValue(Integer id) {
+        //log.info("所要删除的平台属性的id为：{}",id);
+        //删除平台属性
+        int i = baseAttrInfoService.deleteAttrInfoById(id);
+        //删除平台属性对应的值
+        int j = baseAttrInfoService.deleteAttrValueInfoById(id);
+
+
+
+
+
+
+
         return "ok";
     }
 

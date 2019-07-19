@@ -16,6 +16,8 @@ public class BaseAttrInfoAndValueVO {
 
     private String attrName;
 
+    private Integer catalog3Id;
+
     private List<BaseAttrValueVo> attrValues;
 
 }
