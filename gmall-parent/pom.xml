@@ -70,7 +70,6 @@
                 <artifactId>mybatis-plus-boot-starter</artifactId>
                 <version>${mybatis.plus.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>com.alibaba</groupId>
                 <artifactId>fastjson</artifactId>
@@ -174,6 +173,7 @@
                 <version>${beanUtils.version}</version>
             </dependency>
         </dependencies>
+
     </dependencyManagement>
 
     <build>

@@ -23,14 +23,16 @@
         <!----------------商品图片列表 ----------------------->
 
         <table id="spuImgDg" class="easyui-datagrid" title="商品图片列表"
-               data-options="singleSelect:true,method:'get',toolbar:'#spuImgTootbar'" >
+               data-options="singleSelect:true,method:'get',toolbar:'#spuImgTootbar',
+                idField:'id',view:detailview,detailFormatter:spuImgTableDetailFormatter" >
             <thead>
                 <tr>
+                    <!--idField:'id';快速使用id这一列的值检索到当前行的索引-->
                     <th data-options="field:'id',width:100">图片id</th>
                     <th data-options="field:'imgName',width:200">图片名称</th>
                     <th data-options="field:'imgUrl',width:100,align:'right',hidden:true">图片url</th>
-					<th data-options="field:'process',width:200">上传进度</th>
-                    <th data-options="field:'status',width:100">图片状态</th>
+					<th data-options="field:'process',width:200,formatter:spuImgProcessCellFormatter">上传进度</th>
+                    <th data-options="field:'status',width:100,formatter:spuImgStatusCellFormatter">图片状态</th>
                 </tr>
             </thead>
         </table>
@@ -38,7 +40,7 @@
         <!----------------图片列表工具栏----------------------->
         <div id="spuImgTootbar" style="padding:5px;height:auto"  >
             <div style="margin-bottom:5px">
-                <a href="#" id="spuImgAdd" class="easyui-linkbutton" iconCls="icon-add" plain="true">添加图片</a>
+                <a href="#" id="spuImgAddBtn" class="easyui-linkbutton" iconCls="icon-add" plain="true">添加图片</a>
                 <a href="#" id="spuImgUploadBtn" class="easyui-linkbutton" iconCls="icon-save" plain="true" >图片上传</a>
                 <a href="#" class="easyui-linkbutton" iconCls="icon-remove" plain="true">删除</a>
             </div>
@@ -82,6 +84,128 @@
     $("#spuSaleAttrAddBtn").click(function () {
         $("#spuSaleAttr_dlg").dialog("open");
     })
+
+    /**
+     * 初始化Web Uploader，创建webuploader的初始化实例对象
+     */
+    var uploader = WebUploader.create({
+            // 选完文件后，是否自动上传。
+            auto: false,
+            // swf文件路径
+            swf: '/webuploader/Uploader.swf',
+            // 文件接收服务端。指定处理文件上传请求的地址
+            server: 'file/upload',
+            // 选择文件的按钮。可选。
+            // 内部根据当前运行是创建，可能是input元素，也可能是flash.
+            pick: '#spuImgAddBtn',
+            // 只允许选择图片文件。
+            accept: {
+                title: 'Images',
+                extensions: 'gif,jpg,jpeg,bmp,png',
+                mimeTypes: 'image/*'
+            }
+        });
+    //由于引入了webuploader后默认生成按钮触发div宽高都是1没法点击，所以进行修改；
+    $("#spuImgAddBtn div:eq(0)").css({
+        width:'100%',
+        height:'100%'
+    });
+
+    /**
+     * 当有文件添加进来的时候，在图片的table中显示图片信息
+     */
+    uploader.on( 'fileQueued', function( file ) {
+        console.log("fileQueued");
+        $("#spuImgDg").datagrid('appendRow',{
+            id:file.id,
+            imgName:file.name,
+            imgUrl:'',
+            process:0, //自定义显示进度数据
+            status:'等待上传'
+        });
+    });
+
+    /**
+     * 文件上传过程中创建进度条实时显示,在图片的table中显示图片进度条内容
+     */
+    uploader.on( 'uploadProgress', function( file, percentage ) {
+        console.log("uploadProgress");
+        //percentage是一个0-1内的多位小数，而进度条需要传一个0-100内的数
+        var precent = Math.round(percentage*10000)/100
+        //1、先找到当前上传的是哪一行的数据
+        var index = $("#spuImgDg").datagrid('getRowIndex',file.id);
+        //2、动态修改这一行数据的上传进度和图片状态
+        $("#spuImgDg").datagrid('updateRow',{
+            index:index,
+            row: {
+                process: precent,
+                status: '正在上传'
+            }
+        });
+    });
+
+    /**
+     * 文件上传成功，在图片的table中显示图片上传状态
+     */
+    uploader.on( 'uploadSuccess', function( file, response ) {
+        console.log("uploadSuccess");
+        //console.log(response);{_raw: "https://m.360buyimg.com/babel/jfs/t5137/20/1794970752/352145/d56e4e94/591417dcN4fe5ef33.jpg"}
+        var index = $("#spuImgDg").datagrid('getRowIndex',file.id);
+        $("#spuImgDg").datagrid('updateRow',{
+            index:index,
+            row: {
+                status: '上传成功',
+                imgUrl:response._raw
+            }
+        });
+    });
+
+    /**
+     * 文件上传失败，显示上传出错
+     */
+    uploader.on( 'uploadError', function( file ) {
+
+        $.message.alert('警告','上传失败');
+    });
+
+    /**
+     * 图片上传进度单元格格式化方法
+     */
+    function spuImgProcessCellFormatter(value,row,index) {
+        //$("<div></div>")创建一个div
+        var processBar = $("<div></div>").progressbar({
+            value: value
+        });
+        //由于.html()是返回标签的内容，所以最外层的div标签会少掉，再在最外层嵌套一个div则可获取完整的进度条的html内容
+        var html_content = $("<div></div>").append(processBar).html();
+        return html_content;
+    }
+
+    /**
+     * 图片状态单元格格式化方法
+     */
+    function spuImgStatusCellFormatter(value,row,index) {
+        if(value == '等待上传') {
+            return "<label style='color: blue;'>"+value+"</label>";
+        } else {
+            return "<lable style='color: green;'>"+value+"</label>";
+        }
+    }
+
+    /**
+     * 点击图片上传按钮，触发单机时间，开始上传
+     */
+    $("#spuImgUploadBtn").click(function () {
+        uploader.upload();
+    })
+
+    
+    function spuImgTableDetailFormatter(rowIndex, rowData) {
+        return "<img src='"+rowData.imgUrl+"' style='width: 150px;height: auto'/>";
+    }
+
+
+
 
     /*]]>*/
 </script>

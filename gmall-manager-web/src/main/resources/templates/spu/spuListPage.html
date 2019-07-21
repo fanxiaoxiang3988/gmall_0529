@@ -6,6 +6,7 @@
 <body>
 <div class="easyui-panel" title=""  data-options="border:true">
     <!-----------------列表 ----------------------------->
+    <!-- 页面上每一个属性名都和javaBean的属性名一模一样 -->
     <table id="spulist_dg" class="easyui-datagrid" title="spu列表"
            data-options="singleSelect:true,method:'get' ,toolbar:'#spulist_tb'">
         <thead>
@@ -49,7 +50,7 @@
             三级分类：
             <select name="ctg3ForSpuList" id="ctg3ForSpuList" class="easyui-combobox"  style="width:100px"
                     data-options="valueField:'id',textField:'name',onSelect:function(rec){
-
+                    refreshSpuListTable(rec.id);
                 }"></select>
             <a href="#" onclick="refreshSpuListTable()" class="easyui-linkbutton" iconCls="icon-search">刷新属性列表</a>
         </div>
@@ -65,8 +66,18 @@
         /**
          * 刷新spu列表
          */
-        function refreshSpuListTable() {
-            
+        function refreshSpuListTable(id) {
+            var c3id = null;
+            if(id == null) {
+                c3id = getSpuCatalog3Info().id;
+            } else {
+                c3id = id;
+            }
+            //获取数据，刷新销售属性的表格
+            $("#spulist_dg").datagrid({
+                url:'spu/info.json?catalog3Id='+c3id
+                //url:'spu/info.json/'+c3id
+            });
         }
 
         /**

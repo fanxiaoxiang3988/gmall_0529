@@ -4,15 +4,12 @@ import com.alibaba.dubbo.config.annotation.Service;
 import com.atguigu.gmall.manager.BaseAttrInfo;
 import com.atguigu.gmall.manager.BaseAttrInfoService;
 import com.atguigu.gmall.manager.BaseAttrValue;
-import com.atguigu.gmall.manager.BaseCatalog3;
 import com.atguigu.gmall.manager.mapper.BaseAttrInfoMapper;
 import com.atguigu.gmall.manager.mapper.BaseAttrValueMapper;
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.ArrayList;
 import java.util.List;
 
