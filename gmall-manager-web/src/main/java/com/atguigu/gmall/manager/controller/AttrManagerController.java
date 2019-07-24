@@ -92,12 +92,6 @@ public class AttrManagerController {
         //删除平台属性对应的值
         int j = baseAttrInfoService.deleteAttrValueInfoById(id);
 
-
-
-
-
-
-
         return "ok";
     }
 

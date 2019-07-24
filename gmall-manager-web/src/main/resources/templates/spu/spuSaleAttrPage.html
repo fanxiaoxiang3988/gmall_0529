@@ -11,16 +11,18 @@
      closed="true"  data-options="iconCls:'icon-save',resizable:true,modal:false" buttons="#spuSaleAttrBtns" >
   <br/><br/>
     <!------------------从基本销售属性中选择------------->
-    销售属性：  <select name="saleAttr" id="saleAttrSelect"  class="easyui-combobox" data-options="valueField:'id',textField:'name'" style="width:100px">  </select>
+    销售属性：  <select id="saleAttrSelect" name="saleAttr" class="easyui-combobox"
+                   data-options="valueField:'id',textField:'name',url:'spu/base_sale_attr',onSelect:clearSaleAttrValueTable" style="width:100px">
+                </select>
     <br/><br/>
-
     <!----------------销售属性值列表---------------------------->
     <table id="spuSaleAttrValueDg" class="easyui-datagrid" title="销售属性值列表"
-           data-options="singleSelect:true,method:'get',toolbar:'#spuSaleAttrValueTootbar'" >
+           data-options="singleSelect:true,method:'get',toolbar:'#spuSaleAttrValueTootbar',
+            onDblClickCell:spuSaleAttrValueDg_onClickCell" >
         <thead>
             <tr>
                 <th data-options="field:'id',width:100">属性id</th>
-                <th data-options="field:'saleAttrValueName',width:100">属性值</th>
+                <th data-options="field:'saleAttrValueName',width:100,editor: {type: 'validatebox',options: { required: true}}">属性值</th>
             </tr>
         </thead>
     </table>
@@ -29,19 +31,127 @@
     <div id="spuSaleAttrValueTootbar" style="padding:5px;height:auto"  >
         <div style="margin-bottom:5px">
             <a href="#" id="spuSaleAttrValueAddBtn" class="easyui-linkbutton" iconCls="icon-add" plain="true">添加</a>
-            <a href="#" class="easyui-linkbutton" iconCls="icon-remove" plain="true"  >删除</a>
+            <a href="#" id="spuSaleAttrValueDelBtn" class="easyui-linkbutton" iconCls="icon-remove" plain="true"  >删除</a>
         </div>
     </div>
 
 
     <div id="spuSaleAttrBtns">
-        <a href="#" class="easyui-linkbutton">确 定</a>
+        <a href="#" class="easyui-linkbutton" onclick="saveTempSpuSaleAttrValues()">确 定</a>
         <a href="#" class="easyui-linkbutton" onclick="$('#spuSaleAttr_dlg').dialog('close')">关 闭</a>
     </div>
 </div>
 
 <script th:inline="javascript">
+    /*<![CDATA[*/
 
+    /**
+     * 点击销售属性下拉框后，清空下面的销售属性值的表格
+     */
+    function clearSaleAttrValueTable() {
+        $("#spuSaleAttrValueDg").datagrid({data:[]});
+    }
+
+    /**
+     * 临时保存销售属性对应的所有值
+     * 由于此页面是由spuInfoPage页面引入的，所以可以在这里定义一个数组，用来存储当前添加spu的所有销售属性
+     * 其格式为：
+     *      id:null,
+     *      spuId:null,
+     *      saleAttrId:0302,
+     *      saleAttrName:'颜色',
+     *      saleAttrValues:[
+     *      {id:null,spuId:null,saleAttrId:0302,saleAttrValueName:'黑'},
+     *      {id:null,spuId:null,saleAttrId:0302,saleAttrValueName:'白'},
+     *      {id:null,spuId:null,saleAttrId:0302,saleAttrValueName:'灰'}
+     *      ]
+     */
+    function saveTempSpuSaleAttrValues(){
+        var saleAttrId = $("#saleAttrSelect").combobox('getValue');
+        var saleAttrName = $("#saleAttrSelect").combobox('getText');
+        var valueData = $("#spuSaleAttrValueDg").datagrid("getRows");
+        var bigSaleAttrAndValues = {
+            id:null,
+            spuId:null,
+            saleAttrId:saleAttrId,
+            saleAttrName:saleAttrName,
+            saleAttrValues:[]
+        }
+        $.each(valueData,function () {
+            var id = this.id
+            var saleAttrValueName = this.saleAttrValueName
+            var attrValueObj = {
+                id:id,
+                saleAttrValueName:saleAttrValueName
+            }
+            bigSaleAttrAndValues.saleAttrValues.push(attrValueObj);
+        });
+        //console.log(bigSaleAttrAndValues);
+        /**
+         * id: null, spuId: null, saleAttrId: "1", saleAttrName: "颜色", saleAttrValues: Array(3)
+         * 0: {id: "", saleAttrValueName: "黑"}
+         * 1: {id: "", saleAttrValueName: "白"}
+         * 2: {id: "", saleAttrValueName: "灰"}
+         */
+        //关闭对话框
+        $("#spuSaleAttr_dlg").dialog('close');
+        /*$("#spuSaleAttrDg").datagrid('appendRow',{
+            id: bigSaleAttrAndValues.id,
+            spuId: bigSaleAttrAndValues.spuId,
+            saleAttrId: bigSaleAttrAndValues.saleAttrId,
+            saleAttrName: bigSaleAttrAndValues.saleAttrName,
+            spuSaleAttrValues: bigSaleAttrAndValues.saleAttrValues
+        });*/
+        $("#spuSaleAttrDg").datagrid('appendRow',bigSaleAttrAndValues);
+        //测试看添加了一行以后，再次获取，能否得到之前添加的销售属性及其属性值，如果可以，则便于最后的保存
+        console.log($("#spuSaleAttrDg").datagrid("getRows"));
+    }
+
+    /**
+     * 添加一行数据
+     */
+    $("#spuSaleAttrValueAddBtn").click(function () {
+        $('#spuSaleAttrValueDg').datagrid('appendRow',{
+            id: '',
+            saleAttrValueName: ''
+        });
+    });
+
+    /**
+     * 删除一行数据
+     */
+    $("#spuSaleAttrValueDelBtn").click(function () {
+        var data = $('#spuSaleAttrValueDg').datagrid('getSelected');
+        //获取当前行的索引
+        var index = $('#spuSaleAttrValueDg').datagrid('getRowIndex',data);
+        //删除指定行
+        $('#spuSaleAttrValueDg').datagrid('deleteRow',index);
+    });
+
+    /**
+     * 双击编辑功能(前一部分公用代码提取到了easyui/clickedit中，并在main页面引用)
+     */
+    var spuSaleAttrValueDg_editIndex = undefined;
+    function spuSaleAttrValueDg_endEditing(){
+        if (spuSaleAttrValueDg_editIndex == undefined){return true}
+        if ($('#spuSaleAttrValueDg').datagrid('validateRow', spuSaleAttrValueDg_editIndex)){
+            $('#spuSaleAttrValueDg').datagrid('endEdit', spuSaleAttrValueDg_editIndex);
+            spuSaleAttrValueDg_editIndex = undefined;
+            return true;
+        } else {
+            return false;
+        }
+    }
+    function spuSaleAttrValueDg_onClickCell(index, field){
+        if (spuSaleAttrValueDg_endEditing()){
+            $('#spuSaleAttrValueDg').datagrid('selectRow', index)
+                .datagrid('editCell', {index:index,field:field});
+            spuSaleAttrValueDg_editIndex = index;
+        }
+    }
+
+
+    /*]]>*/
 </script>
 
 </body>

@@ -30,7 +30,7 @@ public class GmallManagerWebApplicationTests {
         StorageClient storageClient=new StorageClient(trackerServer,null);
 
         //
-        String localFilePath="F:\\picture\\picture_ym\\fairy.jpg";
+        String localFilePath="F:\\picture\\picture_ym\\yangmi.jpg";
         //4、使用StorageClient给Storage上传文件
         String[] upload_file = storageClient.upload_file(localFilePath,"jpg",null);
 

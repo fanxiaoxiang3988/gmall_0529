@@ -5,7 +5,6 @@
     <title>spu信息编辑页面</title>
 </head>
 <body>
-
 <!-----------------弹出框----------------------------->
 <div id="spu_dlg" class="easyui-dialog" title="编辑spu" style="width:700px;height:520px;"
      closed="true"  data-options="iconCls:'icon-save',resizable:true,modal:false" buttons="#spuBtns" >
@@ -16,12 +15,9 @@
         <br/><br/>
         <label>spu描述:</label>
         <input  id="description" name="description" class="easyui-textbox" data-options="multiline:true" style="width:500px;height:100px"/>
-
         <input id="spuId" name="spuId" type="hidden"/>
         <br/><br/>
-
         <!----------------商品图片列表 ----------------------->
-
         <table id="spuImgDg" class="easyui-datagrid" title="商品图片列表"
                data-options="singleSelect:true,method:'get',toolbar:'#spuImgTootbar',
                 idField:'id',view:detailview,detailFormatter:spuImgTableDetailFormatter" >
@@ -36,7 +32,6 @@
                 </tr>
             </thead>
         </table>
-
         <!----------------图片列表工具栏----------------------->
         <div id="spuImgTootbar" style="padding:5px;height:auto"  >
             <div style="margin-bottom:5px">
@@ -45,19 +40,20 @@
                 <a href="#" class="easyui-linkbutton" iconCls="icon-remove" plain="true">删除</a>
             </div>
         </div>
-
         <br/><br/>
         <!----------------销售属性列表---------------------------->
         <table id="spuSaleAttrDg" class="easyui-datagrid" title="销售属性列表"
                data-options="singleSelect:true,method:'get',toolbar:'#spuSaleAttrTootbar'" >
             <thead>
                 <tr>
-                    <th data-options="field:'id',width:100">销售属性id</th>
-                    <th data-options="field:'imgName',width:300">销售属性名称</th>
+                    <th data-options="field:'id',width:100">标识</th>
+                    <th data-options="field:'spuId',width:100,hidden:true">spuId</th>
+                    <th data-options="field:'saleAttrId',width:100">销售属性id</th>
+                    <th data-options="field:'saleAttrName',width:100">销售属性名称</th>
+                    <th data-options="field:'spuSaleAttrValues',width:100,hidden:true">销售属性的所有值</th>
                 </tr>
             </thead>
         </table>
-
         <!----------------销售属性列表工具栏----------------------->
         <div id="spuSaleAttrTootbar" style="padding:5px;height:auto"  >
             <div style="margin-bottom:5px">
@@ -71,12 +67,57 @@
 </div>
 <!----------------弹出框的按钮组----------------------->
 <div id="spuBtns">
-    <a href="#" class="easyui-linkbutton">保 存</a>
+    <a href="#" class="easyui-linkbutton" onclick="saveAllSpuInfos()">保 存</a>
     <a href="#" class="easyui-linkbutton" onclick="$('#spu_dlg').dialog('close')">关 闭</a>
 </div>
 <div th:include="spu/spuSaleAttrPage"></div>
 <script language="javascript">
-    /*<![CDATA[*/
+
+    /**
+     * 保存页面新添加的所有spu的数据
+     * private String spuName;//商品名字
+     * private String description;//描述
+     * private Integer catalog3Id;//三级分类id
+     * private Integer tmId; //品牌id
+     * private List<SpuImage> images;
+     * private List<SpuSaleAttr> spuSaleAttrs;
+     */
+    function saveAllSpuInfos() {
+        var spuName = $("#spuName").textbox('getValue');
+        var description = $("#description").textbox('getValue');
+        var catalog3Id = getSpuCatalog3Info().id;
+        var spuImages = $("#spuImgDg").datagrid('getRows');
+        var spuSaleAttrs = $("#spuSaleAttrDg").datagrid('getRows');
+        //spuImages使用的是fastDfs上传，会默认给一个id，需要处理一下，否则数据类型对应不上，会报错
+        $.each(spuImages,function () {
+            if(isNaN(this.id)) {
+                this.id = null;
+            }
+        });
+        var spuInfo = {
+            spuName: spuName,
+            description: description,
+            catalog3Id: catalog3Id,
+            spuImages: spuImages,
+            spuSaleAttrs: spuSaleAttrs
+        }
+        var jsonData = JSON.stringify(spuInfo);
+        console.log(jsonData);
+        $.ajax({
+            url:'spu/bigSave',
+            type:'post',
+            data:jsonData,
+            contentType:'application/json',
+            processData:false,
+            success:function (data) {
+                $("#spu_dlg").dialog('close');
+                refreshSpuListTable(null);
+            },
+            error:function () {
+                alert("添加数据失败。。。");
+            }
+        });
+    }
 
     /**
      * 弹出销售属性添加框
@@ -164,7 +205,6 @@
      * 文件上传失败，显示上传出错
      */
     uploader.on( 'uploadError', function( file ) {
-
         $.message.alert('警告','上传失败');
     });
 
@@ -205,9 +245,6 @@
     }
 
 
-
-
-    /*]]>*/
 </script>
 </body>
 </html>
