@@ -23,15 +23,15 @@
             <a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="popAddSpuInfoModal()">添加</a>
             <a href="#" class="easyui-linkbutton" iconCls="icon-edit" plain="true">编辑</a>
             <a href="#" class="easyui-linkbutton" iconCls="icon-remove" plain="true">删除</a>
-            <a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true">增加sku</a>
-            <a href="#" class="easyui-linkbutton" iconCls="icon-search" plain="true"> sku列表</a>
+            <a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="popAddSkuModal()">增加sku</a>
+            <a href="#" class="easyui-linkbutton" iconCls="icon-search" plain="true" onclick="popListSkuModal()"> sku列表</a>
             <a href="#" class="easyui-linkbutton" iconCls="icon-ok" plain="true"> SPU商品上架</a>
         </div>
         <div>
             <!--三级联动效果-->
             一级分类：
             <select id="ctg1ForSpuList"  class="easyui-combobox"  style="width:100px"
-                    data-options="valueField:'id',textField:'name',url:'basecatalog/1/list.json',
+                                     data-options="valueField:'id',textField:'name',url:'basecatalog/1/list.json',
                  onSelect:function(rec){
                      //刷新二级分类的内容
                     $('#ctg2ForSpuList').combobox('reload','basecatalog/2/list.json?id='+rec.id);
@@ -59,9 +59,91 @@
 
 <!--引入spu信息输入框页面-->
 <div th:include="spu/spuInfoPage"></div>
+<div th:include="sku/skuListPage"></div>
+<div th:include="sku/skuInfoPage"></div>
+
 </body>
 <script language="javascript">
     /*<![CDATA[*/
+
+        /**
+         * 点击增加sku按钮时，渲染平台属性选项attrInfoGroup  spuSaleAttrGroup
+         * 思路：动态拼接如下js代码
+         * <label class="infoGroupLabel">
+         *      <label>篇幅</label>
+         *      <select>
+         *          <option>长篇</option>
+         *          <option>短片</option>
+         *      </select>
+         * </label>
+         */
+        function renderBaseAttr() {
+            var c3id = getSpuCatalog3Info().id;
+            $.get('sku/base_attr_info.json?id='+c3id,function (data) {
+                //循环添加平台属性名及其对应选项框内容
+                $.each(data,function () {
+                    //最外层<label>
+                    var bigLabel = $("<label class='infoGroupLabel'></label>");
+                    //给最外层<label>拼接标题（平台属性名）
+                    bigLabel.append("<label>"+this.attrName+"</label>");
+                    //定义<select>选项框
+                    var selectEL = $("<select></select>");
+                    //遍历返回的属性值，动态给select框添加内容
+                    $.each(this.attrValues,function () {
+                        var optionEl = $("<option value='"+this.id+"'>"+this.valueName+"</option>");
+                        selectEL.append(optionEl);
+                    });
+                    bigLabel.append(selectEL);
+                    $("#attrInfoGroup").append(bigLabel).append("  ");
+                })
+            });
+        }
+
+        /**
+         * 点击增加sku按钮时，渲染销售属性选项
+         */
+        function renderSaleAttr() {
+            var spuId = getSelectedSpuInfoRow().id;
+            $.get('sku/spu_sale_attr.json?id='+spuId,function (data) {
+                $.each(data,function () {
+                    var bigLabel = $("<label class='infoGroupLabel'></label>");
+                    bigLabel.append("<label>"+this.saleAttrName+"</label>");
+                    var selectEL = $("<select></select>");
+                    $.each(this.saleAttrValues,function () {
+                        var optionEl = $("<option value='"+this.id+"'>"+this.saleAttrValueName+"</option>");
+                        selectEL.append(optionEl);
+                    });
+                    bigLabel.append(selectEL);
+                    $("#spuSaleAttrGroup").append(bigLabel).append("  ");
+                })
+            });
+        }
+
+        /**
+         * 弹出增加sku的弹框
+         */
+        function popAddSkuModal() {
+            var spuInfo = getSelectedSpuInfoRow();
+            if(spuInfo == null) {
+                $.messager.alert("警告","请先选择一个spu才能为其增加sku的信息");
+            } else {
+                $("#sku_dlg").dialog('open');
+                renderBaseAttr();
+                renderSaleAttr();
+            }
+        }
+
+        /**
+         * 弹出sku列表框
+         */
+        function popListSkuModal() {
+            var spuInfo = getSelectedSpuInfoRow();
+            if(spuInfo == null) {
+                $.messager.alert("警告","请先选择一个spu才能显示其sku信息");
+            } else {
+                $("#skulist_dlg").dialog('open');
+            }
+        }
 
         /**
          * 刷新spu列表
@@ -104,6 +186,13 @@
             }
             return info;
         }
+
+        /**
+         * 返回所选择的spu信息
+         */
+         function getSelectedSpuInfoRow() {
+            return $("#spulist_dg").datagrid('getSelected');
+         }
 
     /*]]>*/
 </script>
