@@ -1,11 +1,15 @@
 package com.atguigu.gmall.manager.sku;
 
 import com.atguigu.gmall.SuperBean;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Sku与平台属性关联信息
  */
+@AllArgsConstructor
+@NoArgsConstructor
 @Data
 public class SkuAttrValue extends SuperBean{
 

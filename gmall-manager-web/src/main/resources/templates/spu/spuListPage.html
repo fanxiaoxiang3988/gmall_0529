@@ -80,12 +80,14 @@
         function renderBaseAttr() {
             var c3id = getSpuCatalog3Info().id;
             $.get('sku/base_attr_info.json?id='+c3id,function (data) {
+                //遍历之前，先清空一下这个div，否则会重复添加导致页面出错
+                $("#attrInfoGroup").empty();
                 //循环添加平台属性名及其对应选项框内容
                 $.each(data,function () {
                     //最外层<label>
                     var bigLabel = $("<label class='infoGroupLabel'></label>");
                     //给最外层<label>拼接标题（平台属性名）
-                    bigLabel.append("<label>"+this.attrName+"</label>");
+                    bigLabel.append("<label attrId='"+this.id+"'>"+this.attrName+"</label>");
                     //定义<select>选项框
                     var selectEL = $("<select></select>");
                     //遍历返回的属性值，动态给select框添加内容
@@ -105,9 +107,10 @@
         function renderSaleAttr() {
             var spuId = getSelectedSpuInfoRow().id;
             $.get('sku/spu_sale_attr.json?id='+spuId,function (data) {
+                $("#spuSaleAttrGroup").empty();
                 $.each(data,function () {
-                    var bigLabel = $("<label class='infoGroupLabel'></label>");
-                    bigLabel.append("<label>"+this.saleAttrName+"</label>");
+                    var bigLabel = $("<label class='attrValueGroupLabel'></label>");
+                    bigLabel.append("<label attrId='"+this.id+"'>"+this.saleAttrName+"</label>");
                     var selectEL = $("<select></select>");
                     $.each(this.saleAttrValues,function () {
                         var optionEl = $("<option value='"+this.id+"'>"+this.saleAttrValueName+"</option>");
@@ -120,6 +123,15 @@
         }
 
         /**
+         * 点击增加sku按钮时，渲染spu的商品图片列表
+         */
+        function renderSpuImagesTable() {
+            $("#skuImgDg").datagrid({
+                url: 'sku/spuImgaes?id='+getSelectedSpuInfoRow().id
+            });
+        }
+
+        /**
          * 弹出增加sku的弹框
          */
         function popAddSkuModal() {
@@ -128,8 +140,12 @@
                 $.messager.alert("警告","请先选择一个spu才能为其增加sku的信息");
             } else {
                 $("#sku_dlg").dialog('open');
+                //加载平台属性
                 renderBaseAttr();
+                //加载销售属性
                 renderSaleAttr();
+                //加载图片
+                renderSpuImagesTable();
             }
         }
 
@@ -142,6 +158,9 @@
                 $.messager.alert("警告","请先选择一个spu才能显示其sku信息");
             } else {
                 $("#skulist_dlg").dialog('open');
+                $("#skulist_dg").datagrid({
+                    url: 'sku/skuinfo?id=' + spuInfo.id
+                });
             }
         }
 

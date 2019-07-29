@@ -75,6 +75,11 @@ public class SpuInfoServiceImpl implements SpuInfoService {
         }
     }
 
-
+    @Override
+    public List<SpuImage> getSpuImages(Integer spuId) {
+        QueryWrapper<SpuImage> wrapper = new QueryWrapper<>();
+        wrapper.eq("spu_id",spuId);
+        return spuImageMapper.selectList(wrapper);
+    }
 
 }
