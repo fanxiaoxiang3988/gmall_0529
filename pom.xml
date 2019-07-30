@@ -19,6 +19,7 @@
         <module>gmall-user-service</module>
         <module>gmall-manager-service</module>
         <module>gmall-manager-web</module>
+        <module>gmall-item-web</module>
     </modules>
     <packaging>pom</packaging>
     <description>这是一个聚合工程</description>

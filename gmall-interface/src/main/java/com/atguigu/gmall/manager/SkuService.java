@@ -20,4 +20,5 @@ public interface SkuService {
 
     List<SkuInfo> getSkuInfoBySpuId(Integer spuId);
 
+    SkuInfo getSkuInfoBySkuId(Integer skuId);
 }

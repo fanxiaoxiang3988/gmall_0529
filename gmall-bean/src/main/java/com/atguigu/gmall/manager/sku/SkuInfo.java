@@ -22,7 +22,7 @@ public class SkuInfo extends SuperBean {
     private BigDecimal price;//当前价格
     private String skuName;//sku名字
     private String skuDesc;//sku描述
-    private BigDecimal  weight;//重量
+    private BigDecimal weight;//重量
     private Integer tmId;//品牌id
     private Integer catalog3Id;//三级分类id(冗余)
     private String skuDefaultImg;//sku默认图片路径（冗余）
@@ -33,5 +33,7 @@ public class SkuInfo extends SuperBean {
     private List<SkuAttrValue> skuAttrValues;
     @TableField(exist = false)
     private List<SkuSaleAttrValue> skuSaleAttrValues;
+    @TableField(exist = false)
+    private List<SkuAllSaveAttrAndValueTo> skuAllSaveAttrAndValueTos;
 
 }
