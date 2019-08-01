@@ -1,5 +1,6 @@
 package com.atguigu.gmall.manager;
 
+import com.atguigu.gmall.manager.sku.SkuAttrValueMappingTo;
 import com.atguigu.gmall.manager.sku.SkuInfo;
 import com.atguigu.gmall.manager.spu.SpuSaleAttr;
 
@@ -21,4 +22,6 @@ public interface SkuService {
     List<SkuInfo> getSkuInfoBySpuId(Integer spuId);
 
     SkuInfo getSkuInfoBySkuId(Integer skuId);
+
+    List<SkuAttrValueMappingTo> getSkuAttrValueMapping(Integer spuId);
 }

@@ -2,6 +2,7 @@ package com.atguigu.gmall.item.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.atguigu.gmall.manager.SkuService;
+import com.atguigu.gmall.manager.sku.SkuAttrValueMappingTo;
 import com.atguigu.gmall.manager.sku.SkuInfo;
 import org.springframework.ui.Model;
 import org.springframework.stereotype.Controller;
@@ -27,9 +28,18 @@ public class ItemController {
 
     @RequestMapping("/{skuId}.html")
     public String itemPage(@PathVariable("skuId") Integer skuId, Model model) {
-
+        //1、查出sku详细信息
         SkuInfo skuInfo = skuService.getSkuInfoBySkuId(skuId);
-        model.addAttribute("skuInfo",skuInfo);
+        model.addAttribute("skuInfo", skuInfo);
+        //2、查出当前sku对应的spu下的，所有的sku销售属性值的组合,效果如下
+        /**
+         * sku_id  spu_id      sku_name         sale_attr_value_id       sale_attr_value_name
+         *   30      55       小米8青春版          117,118               深空土灰,土豪版
+         *   31      55       小米8美人版          120,117               美人版,深空土灰
+         */
+        Integer spuId = skuInfo.getSpuId();
+        List<SkuAttrValueMappingTo> valueMappingTos = skuService.getSkuAttrValueMapping(spuId);
+        model.addAttribute("skuValueMapping", valueMappingTos);
 
         return "item";
     }

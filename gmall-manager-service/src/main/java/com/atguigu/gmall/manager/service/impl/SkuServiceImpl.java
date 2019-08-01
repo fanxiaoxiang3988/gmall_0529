@@ -97,4 +97,9 @@ public class SkuServiceImpl implements SkuService {
 
         return skuInfo;
     }
+
+    @Override
+    public List<SkuAttrValueMappingTo> getSkuAttrValueMapping(Integer spuId) {
+        return skuInfoMapper.getSkuAttrValueMapping(spuId);
+    }
 }

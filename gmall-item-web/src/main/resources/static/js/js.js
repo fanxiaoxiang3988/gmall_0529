@@ -55,14 +55,36 @@ $(function(){
 		});
 
 
-
-	
+		/**
+		 * 切换skuId
+		 * 1、后台告诉页面每一对销售属性值的组合对应的skuId是多少
+		 * 2、页面找到自己选中的skuAttrValueId的组合，找到对应的skuId；
+		 * 3、跳转到这个skuId对应的页面
+		 */
 	    function switchSkuId() {
-		 
+	    	var ids = new Array();
+	    	//根据class选择器，得到所有选中的销售属性值，然后将其拼接
+	    	$.each($("dd.redborder"), function () {
+	    		ids.push($(this).attr('value'));
+			});
+			//取出这个销售属性id拼接值对应的skuId是多少
+			var skuId = $("input[name='"+ids+"']").val();
+			if(skuId == undefined ){
+				//拼接顺序错误也查不出来，反序再查一次
+				ids = ids.reverse();
+				var idsStr = ids.join(','); //118,117
+				var skuId = $("input[name='"+idsStr+"']").val();
+				if(skuId == undefined) {
+					return;
+				} else {
+					location.href='/'+skuId+".html";
+				}
+			}else {
+				//跳转到指定位置
+					location.href='/'+skuId+".html";
+			}
         }
 
-
-	
 
 		$(".box-attr dd").click(function() {
 			$(this).css({
