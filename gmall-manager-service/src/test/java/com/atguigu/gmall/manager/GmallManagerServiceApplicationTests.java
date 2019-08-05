@@ -1,22 +1,21 @@
 package com.atguigu.gmall.manager;
 
-import com.alibaba.fastjson.JSON;
 import com.atguigu.gmall.manager.mapper.BaseCatalog1Mapper;
 import com.atguigu.gmall.manager.mapper.UserMapper;
-import com.atguigu.gmall.manager.sku.SkuAttrValue;
-import com.atguigu.gmall.manager.sku.SkuImage;
-import com.atguigu.gmall.manager.sku.SkuInfo;
-import com.atguigu.gmall.manager.sku.SkuSaleAttrValue;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import java.math.BigDecimal;
-import java.util.ArrayList;
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
 import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 1、导入mybatis-plus的starter
@@ -39,12 +38,50 @@ public class GmallManagerServiceApplicationTests {
     private BaseCatalog1Mapper baseCatalog1Mapper;
     @Autowired
     private CatalogService catalogService;
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;//k-v都是String的
+    @Autowired
+    private RedisTemplate redisTemplate;
+    @Autowired
+    private JedisPool jedisPool;
+
+    @Test
+    public void testJedisPool() {
+
+//        Jedis jedis = jedisPool.getResource();
+//        jedis.set("hello","world666啊啊啊");
+//        String hello = jedis.get("hello");
+//        System.out.println(hello);
+//        boolean b = ("null" != null);
+//        System.out.println(b);
+        String token = UUID.randomUUID().toString();
+        System.out.println(token);
+
+    }
+
+
+    @Test
+    public void testRedisTemplate() {
+
+        ValueOperations<String, String> opsForValue = stringRedisTemplate.opsForValue();
+        opsForValue.set("hello","world",20, TimeUnit.SECONDS);
+        System.out.println("=======redis插入数据成功，666");
+        String hello = opsForValue.get("hello");
+        System.out.println("=======刚刚插入的值是：" + hello);
+
+        ValueOperations valueOperations = redisTemplate.opsForValue();
+        valueOperations.set("hello","world",30,TimeUnit.SECONDS);
+        System.out.println("=======redis插入数据成功，666");
+        Object hello1 = valueOperations.get("hello");
+        System.out.println("=======刚刚插入的值是：" + hello1);
+
+    }
 
     /*@Test
     public void testSkuInfoJson(){
 
         *//**
-         *     private Integer skuId;//当前图片对应的skuId
+         private Integer skuId;//当前图片对应的skuId
          private String imgName;//图片的名字
          private String imgUrl;//图片的url
          private Integer spuImgId;//图片对应的spu_image表中的id
@@ -84,7 +121,6 @@ public class GmallManagerServiceApplicationTests {
 
         String s = JSON.toJSONString(skuInfo);
         System.out.println(s);
-
 
     }*/
 

@@ -21,7 +21,7 @@ public interface SkuService {
 
     List<SkuInfo> getSkuInfoBySpuId(Integer spuId);
 
-    SkuInfo getSkuInfoBySkuId(Integer skuId);
+    SkuInfo getSkuInfoBySkuId(Integer skuId) throws InterruptedException;
 
     List<SkuAttrValueMappingTo> getSkuAttrValueMapping(Integer spuId);
 }

@@ -4,11 +4,11 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.atguigu.gmall.manager.SkuService;
 import com.atguigu.gmall.manager.sku.SkuAttrValueMappingTo;
 import com.atguigu.gmall.manager.sku.SkuInfo;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.ui.Model;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -19,6 +19,7 @@ import java.util.Map;
  * @email fanxiaoxiang3988@126.com
  * @date 2019/7/29 0029
  */
+@Slf4j
 @Controller
 public class ItemController {
 
@@ -29,7 +30,12 @@ public class ItemController {
     @RequestMapping("/{skuId}.html")
     public String itemPage(@PathVariable("skuId") Integer skuId, Model model) {
         //1、查出sku详细信息
-        SkuInfo skuInfo = skuService.getSkuInfoBySkuId(skuId);
+        SkuInfo skuInfo = null;
+        try {
+            skuInfo = skuService.getSkuInfoBySkuId(skuId);
+        } catch (InterruptedException e) {
+            log.debug("查询sku信息错误");
+        }
         model.addAttribute("skuInfo", skuInfo);
         //2、查出当前sku对应的spu下的，所有的sku销售属性值的组合,效果如下
         /**
