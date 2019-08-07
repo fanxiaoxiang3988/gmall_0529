@@ -1,5 +1,6 @@
 package com.atguigu.gmall.manager;
 
+import com.atguigu.gmall.manager.es.SkuBaseAttrEsVo;
 import com.atguigu.gmall.manager.sku.SkuAttrValueMappingTo;
 import com.atguigu.gmall.manager.sku.SkuInfo;
 import com.atguigu.gmall.manager.spu.SpuSaleAttr;
@@ -24,4 +25,6 @@ public interface SkuService {
     SkuInfo getSkuInfoBySkuId(Integer skuId) throws InterruptedException;
 
     List<SkuAttrValueMappingTo> getSkuAttrValueMapping(Integer spuId);
+
+    List<SkuBaseAttrEsVo> getSkuBaseAttrValueIds(Integer skuId);
 }

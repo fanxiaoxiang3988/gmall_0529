@@ -1,6 +1,8 @@
 package com.atguigu.gmall.manager.controller;
 
 import java.util.List;
+
+import com.atguigu.gmall.manager.SkuEsService;
 import lombok.extern.slf4j.Slf4j;
 import com.atguigu.gmall.manager.SkuService;
 import com.atguigu.gmall.manager.sku.SkuInfo;
@@ -29,6 +31,8 @@ public class SkuController {
     private SkuService skuService;
     @Reference
     private SpuInfoService spuInfoService;
+    @Reference
+    private SkuEsService skuEsService;
 
     /**
      * 根据3级分类id查出其对应的所有的平台属性名及其属性值
@@ -88,6 +92,19 @@ public class SkuController {
     @RequestMapping("/skuinfo")
     public List<SkuInfo> getSkuInfoBySpuId(@RequestParam("id") Integer spuId){
         return skuService.getSkuInfoBySpuId(spuId);
+    }
+
+    /**
+     * 根据传入的skuId上架商品，将其缓存进es中
+     * 首页（http://search.gmall.com/list.html）获取es中的数据
+     * 只有缓存进es才可以查看和购买
+     * @return
+     */
+    @RequestMapping("/onSale")
+    public String onSale(@RequestParam("skuId") Integer skuId) {
+        //这个方法最好是一个异步方法，不要阻塞其他请求了
+        skuEsService.onSale(skuId);
+        return "ok";
     }
 
 }

@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSON;
 import com.atguigu.gmall.manager.BaseAttrInfo;
 import com.atguigu.gmall.manager.SkuService;
 import com.atguigu.gmall.manager.constant.RedisCacheKeyConst;
+import com.atguigu.gmall.manager.es.SkuBaseAttrEsVo;
 import com.atguigu.gmall.manager.mapper.BaseAttrInfoMapper;
 import com.atguigu.gmall.manager.mapper.sku.SkuAttrValueMapper;
 import com.atguigu.gmall.manager.mapper.sku.SkuImageMapper;
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -161,6 +163,22 @@ public class SkuServiceImpl implements SkuService {
     @Override
     public List<SkuAttrValueMappingTo> getSkuAttrValueMapping(Integer spuId) {
         return skuInfoMapper.getSkuAttrValueMapping(spuId);
+    }
+
+    @Override
+    public List<SkuBaseAttrEsVo> getSkuBaseAttrValueIds(Integer skuId) {
+        QueryWrapper<SkuAttrValue> wrapper = new QueryWrapper<>();
+        wrapper.eq("sku_id", skuId);
+        List<SkuAttrValue> skuAttrValues = skuAttrValueMapper.selectList(wrapper);
+        List<SkuBaseAttrEsVo> list = new ArrayList<>();
+        if(skuAttrValues!= null && skuAttrValues.size()>0) {
+            for (SkuAttrValue skuAttrValue : skuAttrValues) {
+                SkuBaseAttrEsVo skuBaseAttrEsVo = new SkuBaseAttrEsVo();
+                skuBaseAttrEsVo.setValueId(skuAttrValue.getValueId());
+                list.add(skuBaseAttrEsVo);
+            }
+        }
+        return list;
     }
 
     private SkuInfo getFromDb(Integer skuId){
