@@ -1,7 +1,6 @@
 package com.atguigu.gmall.manager.es;
 
 import lombok.Data;
-
 import java.io.Serializable;
 
 /**

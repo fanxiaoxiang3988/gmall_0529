@@ -23,8 +23,22 @@
         SELECT bai.*,bav.id v_id,bav.value_name,bav.attr_id
         FROM base_attr_info bai
         JOIN base_attr_value bav ON bai.id = bav.attr_id
-        WHERE bai.catalog3_id = 61
+        WHERE bai.catalog3_id = #{catalog3Id}
         ORDER BY bai.id
+    </select>
+
+
+    <select id="getBaseAttrInfoGroupByValueId" resultMap="BaseAttrInfoResultMap">
+        select bai.*, bav.id v_id, bav.value_name, bav.attr_id
+        from base_attr_info bai
+        left join base_attr_value bav
+        on bai.id = bav.attr_id
+        where bai.id in (
+        select attr_id from base_attr_value where id in
+        <foreach  item="item" collection="valueIds" index="index"  open="(" separator="," close=")">
+        #{item}
+        </foreach>
+        )
     </select>
 
 </mapper>

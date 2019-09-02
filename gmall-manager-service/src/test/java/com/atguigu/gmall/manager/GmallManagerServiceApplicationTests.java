@@ -45,6 +45,7 @@ public class GmallManagerServiceApplicationTests {
     @Autowired
     private JedisPool jedisPool;
 
+
     @Test
     public void testJedisPool() {
 

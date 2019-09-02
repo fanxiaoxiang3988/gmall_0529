@@ -1,18 +1,20 @@
 package com.atguigu.gmall.item.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.atguigu.gmall.constant.CookieConstant;
 import com.atguigu.gmall.manager.SkuEsService;
 import com.atguigu.gmall.manager.SkuService;
 import com.atguigu.gmall.manager.sku.SkuAttrValueMappingTo;
 import com.atguigu.gmall.manager.sku.SkuInfo;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.ui.Model;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -52,7 +54,8 @@ public class ItemController {
         Integer spuId = skuInfo.getSpuId();
         List<SkuAttrValueMappingTo> valueMappingTos = skuService.getSkuAttrValueMapping(spuId);
         model.addAttribute("skuValueMapping", valueMappingTos);
-
+        //3、增加点击率，更改es数据库中hotScore的评分（这一部分可以设为异步的方法）
+        skuService.incrSkuHotScore(skuId);
         return "item";
     }
 
@@ -77,6 +80,25 @@ public class ItemController {
         List<Map<String, String>> maps = Arrays.asList(map1, map2, map3);
         model.addAttribute("books", maps);
         return "thymeleafTest";
+    }
+
+    @RequestMapping("/haha")
+    public String hahaha(@CookieValue(name = CookieConstant.SSO_COOKIE_NAME, required = false) String cookieValue,
+                         String token, HttpServletRequest request, HttpServletResponse response) {
+        if(!StringUtils.isEmpty(token) && cookieValue == null) {
+            //只要有这个token，证明刚刚登陆成功，将这个token设置进cookie中
+            Cookie cookie = new Cookie(CookieConstant.SSO_COOKIE_NAME, token);
+            cookie.setPath("/");
+            response.addCookie(cookie);
+            return "haha";
+        }
+        if(StringUtils.isEmpty(cookieValue)) {
+            //返回登陆页
+            return "redirect:http://www.gmallsso.com/login?originUrl="+request.getRequestURL();
+        } else {
+            //验证cookie的时效性
+            return "haha";
+        }
     }
 
 }

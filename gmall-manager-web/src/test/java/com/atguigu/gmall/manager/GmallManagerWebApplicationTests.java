@@ -9,9 +9,27 @@ import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.LinkedList;
+import java.util.Vector;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class GmallManagerWebApplicationTests {
+
+    @Test
+    public void testCollection() {
+        Vector<Object> aaa = new Vector<>();
+        aaa.add("a");
+        aaa.addElement("b");
+        System.out.println("=================="+aaa);
+        System.out.println("=================="+aaa.get(0));
+//        LinkedList<Object> objects = new LinkedList<>();
+//        objects.add("aaa");
+//        objects.add(1,"sss");
+//        System.out.println(objects);
+//        System.out.println(objects.get(0));
+//        System.out.println(objects.get(1));
+    }
 
     @Test
     public void contextLoads() throws Exception {

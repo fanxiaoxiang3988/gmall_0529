@@ -27,4 +27,8 @@ public interface SkuService {
     List<SkuAttrValueMappingTo> getSkuAttrValueMapping(Integer spuId);
 
     List<SkuBaseAttrEsVo> getSkuBaseAttrValueIds(Integer skuId);
+
+    List<BaseAttrInfo> getBaseAttrInfoGroupByValueId(List<Integer> valueIds);
+
+    void incrSkuHotScore(Integer skuId);
 }

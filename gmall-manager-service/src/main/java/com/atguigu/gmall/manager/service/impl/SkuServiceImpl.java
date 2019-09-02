@@ -1,8 +1,10 @@
 package com.atguigu.gmall.manager.service.impl;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.dubbo.config.annotation.Service;
 import com.alibaba.fastjson.JSON;
 import com.atguigu.gmall.manager.BaseAttrInfo;
+import com.atguigu.gmall.manager.SkuEsService;
 import com.atguigu.gmall.manager.SkuService;
 import com.atguigu.gmall.manager.constant.RedisCacheKeyConst;
 import com.atguigu.gmall.manager.es.SkuBaseAttrEsVo;
@@ -17,6 +19,8 @@ import com.atguigu.gmall.manager.spu.SpuSaleAttr;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.transaction.annotation.Transactional;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
@@ -49,6 +53,9 @@ public class SkuServiceImpl implements SkuService {
     private SkuSaleAttrValueMapper skuSaleAttrValueMapper;
     @Autowired
     private JedisPool jedisPool;
+
+    @Reference
+    private SkuEsService skuEsService;
 
     @Override
     public List<BaseAttrInfo> getBaseAttrInfoByCatalog3Id(Integer catalog3Id) {
@@ -119,7 +126,7 @@ public class SkuServiceImpl implements SkuService {
             //我们需要避免一种情况，就是我们再锁规定的RedisCacheKeyConst.LOCK_TIMEOUT这个超时时间结束的时候，业务逻辑还没有删除所
             //那么当我们业务逻辑执行完以后，就很有可能会删除掉别人新创建的锁，所以可以给锁的值设置为一个随机字符串，删除时判定一下，是否是自己当时加的那个锁
             String token = UUID.randomUUID().toString();
-            String lock = jedis.set(RedisCacheKeyConst.LOCK_SKU_INFO+skuId, token, "NX", "EX", RedisCacheKeyConst.LOCK_TIMEOUT);
+            String lock = jedis.set(RedisCacheKeyConst.LOCK_SKU_INFO+":"+skuId, token, "NX", "EX", RedisCacheKeyConst.LOCK_TIMEOUT);
             if(lock == null) {
                 //没有拿到锁
                 log.debug("没有拿到锁，等待重试。。。");
@@ -141,7 +148,7 @@ public class SkuServiceImpl implements SkuService {
                     jedis.setex(key,RedisCacheKeyConst.SKU_INFO_TIMEOUT,skuInfoJson);
                 }
                 //释放锁
-                //....释放锁；解锁有问题吗？删锁的错误姿势 这是一种错误的解锁方式，极端情况：判断玩是否相等，锁过期了，然后删除的时候删除了别人的锁
+                //....释放锁；解锁有问题吗？删锁的错误姿势 这是一种错误的解锁方式，极端情况：判断完是否相等，锁过期了，然后删除的时候删除了别人的锁
 //                String redisToken = jedis.get(RedisCacheKeyConst.LOCK_SKU_INFO);
 //                if(token.equals(redisToken)){
 //                    jedis.del(RedisCacheKeyConst.LOCK_SKU_INFO);
@@ -181,6 +188,11 @@ public class SkuServiceImpl implements SkuService {
         return list;
     }
 
+    @Override
+    public List<BaseAttrInfo> getBaseAttrInfoGroupByValueId(List<Integer> valueIds) {
+        return baseAttrInfoMapper.getBaseAttrInfoGroupByValueId(valueIds);
+    }
+
     private SkuInfo getFromDb(Integer skuId){
         log.debug("缓存中没找到，准备从数据库中查询并插入skuId是{}的商品信息", skuId);
         //查出这个sku的所有基本信息
@@ -199,6 +211,19 @@ public class SkuServiceImpl implements SkuService {
         skuInfo.setSkuAllSaveAttrAndValueTos(skuAllSaveAttrAndValueTos);
 
         return skuInfo;
+    }
+
+    //在redis中增加这个商品的点击次数，每增加3次给es中hotScore字段+1
+    @Async
+    @Override
+    public void incrSkuHotScore(Integer skuId) {
+        Jedis jedis = jedisPool.getResource();
+        Long hincrBy = jedis.hincrBy(RedisCacheKeyConst.SKU_HOT_SCORE, skuId + "", 1);
+        if(hincrBy%3 == 0) {
+            //更新ES的热度
+            skuEsService.updateHotScore(skuId,hincrBy);
+        }
+
     }
 
 }

@@ -13,12 +13,41 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.beans.factory.annotation.Autowired;
 
 
+
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class GmallSearchServiceApplicationTests {
 
     @Autowired
     private JestClient jestClient;
+
+
+//    @Test
+//    public void testES() throws IOException {
+//        SkuEsServiceImpl esService = new SkuEsServiceImpl();
+//        SkuSearchParamEsVo paramEsVo = new SkuSearchParamEsVo();
+//        paramEsVo.setCatalog3Id(61);
+//        paramEsVo.setKeyword("小米");
+//        paramEsVo.setValueId(new Integer[]{82,83});
+//        paramEsVo.setPageNo(1);
+//        String s = esService.buildSkuSearchQueryDSL(paramEsVo);
+//        System.out.println(s);
+//
+//        Search search = new Search.Builder(s)
+//                .addIndex(EsConstant.GMALL_INDEX)
+//                .addType(EsConstant.GMALL_SKU_TYPE).build();
+//
+//        SearchResult result = jestClient.execute(search);
+//        System.out.println("啦啦啦啦啦啦啦啦啦啦啦"+result);
+//        List<SearchResult.Hit<SkuInfoEsVo, Void>> hits = result.getHits(SkuInfoEsVo.class);
+//        System.out.println(hits);
+//        for (SearchResult.Hit<SkuInfoEsVo, Void> hit : hits) {
+//            System.out.println("+++++++++++++" + hit.source.getSkuName());
+//            System.out.println(hit.source);
+//            System.out.println(hit.highlight);
+//            System.out.println(result.getTotal());
+//        }
+//    }
 
     @Test
     public void contextLoads() throws IOException {
