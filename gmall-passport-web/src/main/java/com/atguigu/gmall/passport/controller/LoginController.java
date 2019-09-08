@@ -36,7 +36,7 @@ public class LoginController {
         //登陆过了
         if(!StringUtils.isEmpty(token)) {
             //登陆过了就重定向到之前用户请求的页面
-            return "redirect:"+originUrl+"token=?"+token;
+            return "redirect:"+originUrl+"?token="+token;
         } else {
             //没登陆过(判定用户是否填写了用户信息)
             if(StringUtils.isEmpty(userInfo.getLoginName())) {

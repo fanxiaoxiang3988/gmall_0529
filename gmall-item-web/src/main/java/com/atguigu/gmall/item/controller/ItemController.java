@@ -1,6 +1,7 @@
 package com.atguigu.gmall.item.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.atguigu.gmall.annotation.LoginRequired;
 import com.atguigu.gmall.constant.CookieConstant;
 import com.atguigu.gmall.manager.SkuEsService;
 import com.atguigu.gmall.manager.SkuService;
@@ -82,23 +83,11 @@ public class ItemController {
         return "thymeleafTest";
     }
 
+    //使用注解的方式，统一管理相同逻辑的代码
+    @LoginRequired
     @RequestMapping("/haha")
-    public String hahaha(@CookieValue(name = CookieConstant.SSO_COOKIE_NAME, required = false) String cookieValue,
-                         String token, HttpServletRequest request, HttpServletResponse response) {
-        if(!StringUtils.isEmpty(token) && cookieValue == null) {
-            //只要有这个token，证明刚刚登陆成功，将这个token设置进cookie中
-            Cookie cookie = new Cookie(CookieConstant.SSO_COOKIE_NAME, token);
-            cookie.setPath("/");
-            response.addCookie(cookie);
-            return "haha";
-        }
-        if(StringUtils.isEmpty(cookieValue)) {
-            //返回登陆页
-            return "redirect:http://www.gmallsso.com/login?originUrl="+request.getRequestURL();
-        } else {
-            //验证cookie的时效性
-            return "haha";
-        }
+    public String hahaha() {
+        return "haha";
     }
 
 }

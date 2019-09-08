@@ -1,6 +1,7 @@
 package com.atguigu.gmall.search.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.atguigu.gmall.annotation.LoginRequired;
 import com.atguigu.gmall.manager.SkuEsService;
 import com.atguigu.gmall.manager.es.SkuSearchResultEsVo;
 import org.springframework.stereotype.Controller;
@@ -27,6 +28,7 @@ public class ListController {
         return "list";
     }
 
+    @LoginRequired
     @RequestMapping("/hehe")
     public String hehehe() {
         return "hehe";
