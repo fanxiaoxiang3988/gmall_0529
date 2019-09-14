@@ -5,6 +5,7 @@ import com.atguigu.gmall.constant.CookieConstant;
 import com.atguigu.gmall.utils.CookieUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -13,6 +14,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.annotation.Annotation;
+import java.util.Map;
 
 /**
  * springBoot想要写一个拦截器，最简单的做法就是实现HandlerInterceptor接口
@@ -47,8 +49,29 @@ public class LoginRequireInterceptor implements HandlerInterceptor {
             }
             //2、验证是否存在登陆的Cookie
             if(!StringUtils.isEmpty(cookieValue)) {
-                //说明之前登陆过,Cookie已经放好了
-                return true;
+                //说明之前登陆过,Cookie已经放好了，需要验证令牌的准确性以及时效性
+                try {
+                    RestTemplate restTemplate = new RestTemplate();
+                    String confirmTokenUrl = "http://www.gmallsso.com/confirmToken?token="+cookieValue;
+                    String result = restTemplate.getForObject(confirmTokenUrl, String.class);
+                    System.out.println("远程验证的结果是：" + result);
+                    if("ok".equals(result)){
+                        //验证成功
+                        //解析token，将封装的用户信息放入请求域中
+                        Map<String, Object> map = CookieUtils.resolveTokenData(cookieValue);
+                        //解好以后放进请求域中，当次请求就可以使用了
+                        request.setAttribute("userInfo", map);
+                        return true;
+                    }else{
+                        //验证失败，重新去登陆
+                        String redirectUrl = "http://www.gmallsso.com/login?originUrl=" + request.getRequestURL();
+                        response.sendRedirect(redirectUrl);
+                        return false;
+                    }
+                } catch (Exception e){
+                    //远程服务器都连不上目标方法不执行
+                    return false;
+                }
             }
             //3、两个都没有，则需要去往登陆页面
             if(StringUtils.isEmpty(token) && StringUtils.isEmpty(cookieValue)) {

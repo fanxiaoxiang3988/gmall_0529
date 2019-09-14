@@ -1,8 +1,12 @@
 package com.atguigu.gmall.utils;
 
+import com.alibaba.fastjson.JSON;
+import org.springframework.util.Base64Utils;
+
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Map;
 
 /**
  * @author fanrongxiang
@@ -58,6 +62,22 @@ public class CookieUtils {
                     return cookie.getValue();
                 }
             }
+        }
+        return null;
+    }
+
+    /**
+     * 根据用户传过来的token，解析得到jwt的第二段，取出其封装的用户基本信息并返回
+     * @param token
+     * @return
+     */
+    public static Map<String, Object> resolveTokenData(String token) {
+        String[] split = token.split("\\.");
+        if(split != null && split.length == 3){
+            String s = split[1];
+            byte[] bytes = Base64Utils.decodeFromString(s);
+            String json = new String(bytes);
+            return JSON.parseObject(json, Map.class);
         }
         return null;
     }

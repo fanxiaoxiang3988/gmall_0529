@@ -15,6 +15,7 @@ public class GmallPassportServiceApplicationTests {
     @Test
     public void contextLoads() {
 
+        //DigestUtils默认加工出32位的结果
         String s = DigestUtils.md5Hex("123456");
         System.out.println(s);
 
