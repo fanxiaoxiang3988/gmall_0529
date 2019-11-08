@@ -49,14 +49,14 @@ public class GmallManagerServiceApplicationTests {
     @Test
     public void testJedisPool() {
 
-//        Jedis jedis = jedisPool.getResource();
-//        jedis.set("hello","world666啊啊啊");
-//        String hello = jedis.get("hello");
-//        System.out.println(hello);
+        Jedis jedis = jedisPool.getResource();
+        jedis.set("helloooooo","world666啊啊啊");
+        String hello = jedis.get("helloooooo");
+        System.out.println(hello);
 //        boolean b = ("null" != null);
 //        System.out.println(b);
-        String token = UUID.randomUUID().toString();
-        System.out.println(token);
+//        String token = UUID.randomUUID().toString();
+//        System.out.println(token);
 
     }
 
@@ -65,13 +65,13 @@ public class GmallManagerServiceApplicationTests {
     public void testRedisTemplate() {
 
         ValueOperations<String, String> opsForValue = stringRedisTemplate.opsForValue();
-        opsForValue.set("hello","world",20, TimeUnit.SECONDS);
+        opsForValue.set("hello1","world",20, TimeUnit.SECONDS);
         System.out.println("=======redis插入数据成功，666");
         String hello = opsForValue.get("hello");
         System.out.println("=======刚刚插入的值是：" + hello);
 
         ValueOperations valueOperations = redisTemplate.opsForValue();
-        valueOperations.set("hello","world",30,TimeUnit.SECONDS);
+        valueOperations.set("hello2","world",30,TimeUnit.SECONDS);
         System.out.println("=======redis插入数据成功，666");
         Object hello1 = valueOperations.get("hello");
         System.out.println("=======刚刚插入的值是：" + hello1);

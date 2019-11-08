@@ -15,7 +15,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
  * 但是LoginRequireInterceptor组件所在的包的深度与gmall-item-web启动类加载的深度不同，有可能扫描不到LoginRequireInterceptor组件
  * 有两种解决方式
  * 1、在该类上直接import导入LoginRequireInterceptor组件
- * 2、在gmall-item-web的启动类上标注@ComponentScan("gmall.com.atguigu")放大扫描范围
+ * 2、在gmall-item-web的启动类上标注@ComponentScan("com.atguigu.gmall")放大扫描范围
  */
 @Import(LoginRequireInterceptor.class)
 @Configuration

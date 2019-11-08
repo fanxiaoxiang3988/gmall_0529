@@ -25,7 +25,7 @@
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
         </dependency>
-        <!--整合reid-->
+        <!--整合redis-->
         <!--以后引入了什么资源，就ctrl+n查询***AutoConfiguration,例如RedisAutoConfiguration-->
         <!--1、引入redis的starter；redis的所有都自动配置了-->
         <!--2、在application.properties中配置redis的相关信息-->

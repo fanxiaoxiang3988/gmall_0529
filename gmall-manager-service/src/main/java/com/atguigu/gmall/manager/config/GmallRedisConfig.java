@@ -22,6 +22,7 @@ public class GmallRedisConfig {
      */
     @Bean
     public JedisPool jedisPoolConfig(JedisConnectionFactory factory) {
+        //连接工厂中所有信息都有。
         JedisPoolConfig config = factory.getPoolConfig();
         JedisPool jedisPool = new JedisPool(config, factory.getHostName(), factory.getPort(), factory.getTimeout());
         return jedisPool;

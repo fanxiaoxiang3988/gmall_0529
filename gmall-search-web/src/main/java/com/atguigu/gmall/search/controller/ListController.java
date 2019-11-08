@@ -28,7 +28,7 @@ public class ListController {
         return "list";
     }
 
-    @LoginRequired
+    @LoginRequired(needLogin = true)
     @RequestMapping("/hehe")
     public String hehehe() {
         return "hehe";

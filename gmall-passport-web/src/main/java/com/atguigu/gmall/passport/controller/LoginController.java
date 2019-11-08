@@ -11,12 +11,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * @author fanrongxiang
@@ -31,7 +29,7 @@ public class LoginController {
     private UserInfoService userInfoService;
 
     /**
-     * 前往登陆页面
+     * 前往登陆页面（登陆的方法）
      * @return
      */
     @RequestMapping("/login")

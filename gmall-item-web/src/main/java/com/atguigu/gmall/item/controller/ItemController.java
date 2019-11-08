@@ -84,7 +84,7 @@ public class ItemController {
     }
 
     //使用注解的方式，统一管理相同逻辑的代码
-    @LoginRequired
+    @LoginRequired(needLogin = true)
     @RequestMapping("/haha")
     public String hahaha(HttpServletRequest request) {
         Map<String, Object> userInfo = (Map<String, Object>)request.getAttribute("userInfo");
