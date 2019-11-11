@@ -23,7 +23,10 @@
 
             </ul>ee
             <ul class="header-right">
-                <li><a href="../登录页面\index.html" style="color: red;">你好，请登录</a></li>
+                <li><a href="../登录页面\index.html" style="color: red;"
+                th:if="${userInfo == null}">你好，请登录</a></li>
+                <li><a href="../登录页面\index.html" style="color: red;"
+                       th:if="${userInfo != null}" th:text="${userInfo.nickName}">你好，请登录</a></li>
                 <li><a href="../注册页面\index.html" >免费注册</a></li>
                 <li class="spacer"></li>
                 <li><a href="">我的订单</a></li>
@@ -49,7 +52,7 @@
                 <input type="button" value="搜索" class="one_right_btn">
             </div>
         </div>
-        <div class="one_search_load"    >
+        <div class="one_search_load" th:if="${userInfo == null}" >
             <img src="./img/shop_07.jpg" class="one_load_wraing">
             <span>您还没有登录！登录后购物车的商品将保存到您账号中</span>
             <a href="#"><input type="button" onclick="login()" value="立即登录" class="one_load_btn"></a>
@@ -193,26 +196,6 @@
     </dl>
 </div>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <!--底部-->
 
 <div class="one_footer">
@@ -231,7 +214,7 @@
 
     function login(){
       var s = encodeURIComponent("http://cart.gmall.com/cartList");
-       window.location.href="http://passport.atguigu.com/index?originUrl="+s;
+       window.location.href="http://www.gmallsso.com/login?originUrl="+s;
     }
 
     function checkSku( chkbox){

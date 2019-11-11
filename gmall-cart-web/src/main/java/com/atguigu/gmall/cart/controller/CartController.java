@@ -47,7 +47,9 @@ public class CartController {
                 //还没有创建临时购物车，添加商品并创建一个临时购物车，将临时购物车的id存入cookie中
                 //返回的cartId是购物车在redis中存储所用的key,也是我们临时购物车cart_key在cookie中对应的值
                 cartKey = cartService.addToCartUnLogin(skuId, null, num);
-                response.addCookie(new Cookie(CookieConstant.COOKIE_CART_KEY, cartKey));
+                Cookie cookie = new Cookie(CookieConstant.COOKIE_CART_KEY, cartKey);
+                cookie.setMaxAge(CookieConstant.COOKIE_CART_KEY_MAX_AGE);
+                response.addCookie(cookie);
             } else {
                 //已经创建过了临时购物车
                 cartKey = cartService.addToCartUnLogin(skuId, cartKey, num);
@@ -86,6 +88,16 @@ public class CartController {
     @RequestMapping("/cartList")
     public String cartInfoPage(HttpServletRequest request, HttpServletResponse response) {
         Map<String, Object> userInfo = (Map<String, Object>)request.getAttribute(CookieConstant.LOGIN_USER_INFO_KEY);
+        //判断是否登陆并且有临时购物车（如果cookie中有cart_key，则证明有临时购物车）
+        String tempCart = CookieUtils.getCookieValue(request, CookieConstant.COOKIE_CART_KEY);
+        if(!StringUtils.isEmpty(tempCart) && userInfo != null) {
+            //说明有临时购物车且用户登录了，合并购物车
+            cartService.mergeCart(tempCart, Integer.parseInt(userInfo.get("id").toString()));
+            //删除当前临时购物车的cookie
+            Cookie cookie = new Cookie(CookieConstant.COOKIE_CART_KEY, "fanxiaoxiang");
+            cookie.setMaxAge(0);
+            response.addCookie(cookie);
+        }
         boolean login = false;
         String cartKey = "";
         if(userInfo != null) {

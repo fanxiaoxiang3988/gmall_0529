@@ -53,6 +53,10 @@ public class LoginRequireInterceptor implements HandlerInterceptor {
                  */
                 cookie.setDomain("gmall.com");
                 response.addCookie(cookie);
+                //将用户的信息也放上
+                Map<String, Object> map = CookieUtils.resolveTokenData(token);
+                //解好以后放进请求域中，当次请求就可以使用了
+                request.setAttribute(CookieConstant.LOGIN_USER_INFO_KEY, map);
                 return true;
             }
             //2、验证是否存在登陆的Cookie

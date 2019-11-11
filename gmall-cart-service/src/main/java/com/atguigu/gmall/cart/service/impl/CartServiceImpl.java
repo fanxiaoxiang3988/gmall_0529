@@ -121,14 +121,28 @@ public class CartServiceImpl implements CartService {
         return null;
     }
 
+    /**
+     * 合并购物车
+     * @param cartKey
+     * @param userId
+     */
     @Override
     public void mergeCart(String cartKey, Integer userId) {
-
-
+        //查出临时购物车中的所有数据
+        List<CartItem> cartItems = getCartInfoList(cartKey, false);
+        //把这些数据添加到用户购物车中
+        if(cartItems != null && cartItems.size()>0) {
+            for (CartItem tempCartItem : cartItems) {
+                addToCartLogin(tempCartItem.getSkuItem().getId(), userId, tempCartItem.getNum());
+            }
+        }
+        //删除临时购物车
+        Jedis jedis = jedisPool.getResource();
+        jedis.del(cartKey);
     }
 
     /**
-     * 查询购物车的数据
+     * 根据传过来的临时购物车或者用户id，查询对应的购物车的所有数据
      * @param cartKey 登陆了的话，传过来的是用户id
      * @param login
      * @return
