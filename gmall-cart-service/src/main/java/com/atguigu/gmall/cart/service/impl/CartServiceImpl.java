@@ -3,6 +3,7 @@ package com.atguigu.gmall.cart.service.impl;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.dubbo.config.annotation.Service;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.atguigu.gmall.cart.CartItem;
 import com.atguigu.gmall.cart.CartService;
 import com.atguigu.gmall.cart.CartVo;
@@ -11,6 +12,7 @@ import com.atguigu.gmall.cart.constent.CartConstant;
 import com.atguigu.gmall.manager.SkuService;
 import com.atguigu.gmall.manager.sku.SkuInfo;
 import org.apache.commons.lang3.StringUtils;
+import org.omg.PortableServer.LIFESPAN_POLICY_ID;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import redis.clients.jedis.Jedis;
@@ -66,6 +68,12 @@ public class CartServiceImpl implements CartService {
                         //新增商品
                         String jsonString = JSON.toJSONString(cartItem);
                         jedis.hset(cartKey, skuItem.getId()+"", jsonString);
+                        //拿出之前的顺序，将顺序也更新一下
+                        String fieldOrder = jedis.hget(cartKey, "fieldOrder");
+                        List list = JSON.parseObject(fieldOrder, List.class);
+                        list.add(skuId);
+                        String string = JSON.toJSONString(list);
+                        jedis.hset(cartKey, "fieldOrder", string);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -106,6 +114,12 @@ public class CartServiceImpl implements CartService {
                     cartItem.setTotalPrice(cartItem.getTotalPrice());
                     String json = JSON.toJSONString(cartItem);
                     jedis.hset(cartKey, skuId+"", json);
+                    //拿出之前的顺序，将顺序也更新一下
+                    String fieldOrder = jedis.hget(cartKey, "fieldOrder");
+                    List list = JSON.parseObject(fieldOrder, List.class);
+                    list.add(skuId);
+                    String string = JSON.toJSONString(list);
+                    jedis.hset(cartKey, "fieldOrder", string);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -154,15 +168,17 @@ public class CartServiceImpl implements CartService {
             //登陆了
             queryKey = CartConstant.USER_CART_PREFIX + cartKey;
         }
-        //查询reids中，这个key对应的购物车数据
+
         Jedis jedis = jedisPool.getResource();
         List<CartItem> cartItemList = new ArrayList<>();
-        Map<String, String> hgetAll = jedis.hgetAll(queryKey);
-        for (Map.Entry<String, String> entry : hgetAll.entrySet()) {
-            //String key = entry.getKey();
-            String value = entry.getValue();
-            //转化
-            CartItem cartItem = JSON.parseObject(value, CartItem.class);
+        //查询reids中，这个key对应的排序字段
+        String fieldOrder = jedis.hget(queryKey, "fieldOrder");
+        List list = JSON.parseObject(fieldOrder, List.class);
+        for (Object o : list) {
+            int idSort = Integer.parseInt(o.toString());
+            //遍历排序字段，根据每一个，去查询对应的商品，这样获得的商品的list集合就是有序的
+            String hget = jedis.hget(queryKey, idSort + "");
+            CartItem cartItem = JSON.parseObject(hget, CartItem.class);
             cartItemList.add(cartItem);
         }
         return cartItemList;
@@ -207,6 +223,11 @@ public class CartServiceImpl implements CartService {
             cartItem.setTotalPrice(cartItem.getTotalPrice());
             String jsonString = JSON.toJSONString(cartItem);
             jedis.hset(newCartKey, skuItem.getId()+"", jsonString);
+            //新建购物车时，添加排序字段
+            List<Integer> ids = new ArrayList<>();
+            ids.add(cartItem.getSkuItem().getId());
+            String fieldOrder = JSON.toJSONString(ids);
+            jedis.hset(newCartKey, "fieldOrder", fieldOrder);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
