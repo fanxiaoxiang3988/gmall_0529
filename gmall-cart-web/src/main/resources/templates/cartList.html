@@ -21,7 +21,7 @@
                     <a href="">首页</a>
                 </li>
 
-            </ul>ee
+            </ul>
             <ul class="header-right">
                 <li><a href="../登录页面\index.html" style="color: red;"
                 th:if="${userInfo == null}">你好，请登录</a></li>
@@ -85,7 +85,9 @@
                     <div> </div>
                     <div>
                         <ol>
-                            <li><input type="checkbox"   class="check"   onchange="checkSku(this)"  /></li>
+                            <li><input type="checkbox"   class="check"
+                                       th:checked="${cartItem.check}"
+                                       th:onchange="'checkSku('+${cartItem.skuItem.id}+',this)'"/></li>
                             <li>
                                 <dt><img th:src="${cartItem.skuItem.skuDefaultImg}"   src="img\shop1.jpg" alt=""></dt>
                                 <dd  onclick="toItem(1)">
@@ -133,7 +135,6 @@
             <div>
                 <ol>
                     <li>总价:<span style="color:#e64346;font-weight:bold;font-size:16px;" class="fnt" th:text="${cartVo.totalPrice}">￥0.00</span>  </li>
-
                 </ol>
             </div>
             <div><button  onclick="toTrade()" type="button">去结算</button></div>
@@ -217,20 +218,16 @@
        window.location.href="http://www.gmallsso.com/login?originUrl="+s;
     }
 
-    function checkSku( chkbox){
-        console.log($(chkbox));
-       var skuId= $(chkbox).attr("value");
-       var checked=$(chkbox).prop("checked");
-       var isCheckedFlag="0";
-       if(checked){
-           isCheckedFlag="1";
-       }
-        var param="isChecked="+isCheckedFlag+"&"+"skuId="+skuId;
-        console.log(param);
-        $.post("checkCart",param,function (data) {
+    function checkSku(skuId,_this){
+        var skuId= skuId;
+        var checked=$(_this).prop("checked");
+        var param = {
+            skuId: skuId,
+            checkFlag: checked
+        }
+        $.post("checkItem",param,function (data) {
             sumSumPrice();
         });
-
     }
 
 

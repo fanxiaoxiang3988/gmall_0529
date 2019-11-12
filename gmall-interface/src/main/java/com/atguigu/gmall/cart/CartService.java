@@ -56,4 +56,6 @@ public interface CartService {
      * @return
      */
     CartItem getCartItemInfo(String cartKey, Integer skuId);
+
+    void checkItem(Integer skuId, Boolean checkFlag, String tempCartKey, int userId, boolean loginFlag);
 }

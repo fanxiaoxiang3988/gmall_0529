@@ -168,19 +168,18 @@ public class CartServiceImpl implements CartService {
             //登陆了
             queryKey = CartConstant.USER_CART_PREFIX + cartKey;
         }
-
         Jedis jedis = jedisPool.getResource();
         List<CartItem> cartItemList = new ArrayList<>();
         //查询reids中，这个key对应的排序字段
         String fieldOrder = jedis.hget(queryKey, "fieldOrder");
         List list = JSON.parseObject(fieldOrder, List.class);
-        for (Object o : list) {
-            int idSort = Integer.parseInt(o.toString());
-            //遍历排序字段，根据每一个，去查询对应的商品，这样获得的商品的list集合就是有序的
-            String hget = jedis.hget(queryKey, idSort + "");
-            CartItem cartItem = JSON.parseObject(hget, CartItem.class);
-            cartItemList.add(cartItem);
-        }
+            for (Object o : list) {
+                int idSort = Integer.parseInt(o.toString());
+                //遍历排序字段，根据每一个，去查询对应的商品，这样获得的商品的list集合就是有序的
+                String hget = jedis.hget(queryKey, idSort + "");
+                CartItem cartItem = JSON.parseObject(hget, CartItem.class);
+                cartItemList.add(cartItem);
+            }
         return cartItemList;
     }
 
@@ -190,6 +189,28 @@ public class CartServiceImpl implements CartService {
         String json = jedis.hget(cartKey, skuId + "");
         CartItem cartItem = JSON.parseObject(json, CartItem.class);
         return cartItem;
+    }
+
+    /**
+     * 勾选某个商品
+     * @param skuId 商品id
+     * @param checkFlag 是否被勾选
+     * @param tempCartKey 临时购物车id，如果登录，则为null
+     * @param userId 用户id，如果未登录，则为0
+     * @param loginFlag 是否登录
+     */
+    @Override
+    public void checkItem(Integer skuId, Boolean checkFlag, String tempCartKey, int userId, boolean loginFlag) {
+        //根据用户是否登录，首先确定用户redis中对应的购物车的key
+        String cartKey = loginFlag? CartConstant.USER_CART_PREFIX + userId : tempCartKey;
+        //根据key和skuId,用hget查出对应的商品信息
+        CartItem cartItem = getCartItemInfo(cartKey, skuId);
+        cartItem.setCheck(checkFlag);
+        //修改内部的check勾选状态并重新存放redis信息
+        String string = JSON.toJSONString(cartItem);
+        Jedis jedis = jedisPool.getResource();
+        jedis.hset(cartKey, skuId+"", string );
+        jedis.close();
     }
 
     /**

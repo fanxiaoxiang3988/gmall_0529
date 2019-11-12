@@ -52,7 +52,7 @@ public class CartController {
                 response.addCookie(cookie);
             } else {
                 //已经创建过了临时购物车
-                cartKey = cartService.addToCartUnLogin(skuId, cartKey, num);
+                cartService.addToCartUnLogin(skuId, cartKey, num);
             }
 
         } else {
@@ -116,6 +116,31 @@ public class CartController {
         cartVo.setTotalPrice(cartVo.getTotalPrice());
         request.setAttribute("cartVo", cartVo);
         return "cartList";
+    }
+
+
+    /**
+     * 购物车页面的勾选按钮（勾选了以后修改CartItem的isCheck字段以记录勾选状态）
+     * @param skuId
+     * @param checkFlag
+     * @param request
+     * @return
+     */
+    @LoginRequired(needLogin = false)
+    @RequestMapping("/checkItem")
+    public String checkItem(Integer skuId,Boolean checkFlag,HttpServletRequest request) {
+        //获取用户信息
+        Map<String, Object> userInfo = (Map<String, Object>)request.getAttribute(CookieConstant.LOGIN_USER_INFO_KEY);
+        int userId = 0;
+        try {
+            userId = Integer.parseInt(userInfo.get("id").toString());
+        } catch (Exception e){}
+        //获取临时购物车
+        String tempCartKey = CookieUtils.getCookieValue(request, CookieConstant.COOKIE_CART_KEY);
+        //判断用户是否登录
+        boolean loginFlag = userInfo == null ? false:true;
+        cartService.checkItem(skuId,checkFlag,tempCartKey,userId,loginFlag);
+        return "";
     }
 
 }
