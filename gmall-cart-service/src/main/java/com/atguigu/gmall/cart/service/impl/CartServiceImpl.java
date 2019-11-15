@@ -214,6 +214,31 @@ public class CartServiceImpl implements CartService {
     }
 
     /**
+     * 返回购物车被选中的商品
+     * @param id
+     * @return
+     */
+    @Override
+    public List<CartItem> getCartInfoCheckedList(int id) {
+        List<CartItem> checkedItem = new ArrayList<>();
+        //查询当前用户对应的购物车的所有商品
+        List<CartItem> cartItemList = getCartInfoList(id + "", true);
+        if(cartItemList == null) {
+            return null;
+        }
+        for (CartItem cartItem : cartItemList) {
+            //筛选出商品中被选中的，并返回
+            if(cartItem.isCheck()) {
+                checkedItem.add(cartItem);
+            }
+        }
+        if(checkedItem.size() == 0){
+            return null;
+        }
+        return checkedItem;
+    }
+
+    /**
      * 新建购物车并添加指定商品进购物车
      * @param skuId 商品skuId
      * @param num 数量

@@ -1,6 +1,8 @@
 package com.atguigu.gmall.user;
 
 
+import java.util.List;
+
 /**
  * @author fanrongxiang
  * @email fanxiaoxiang3988@126.com
@@ -21,5 +23,7 @@ public interface UserService {
      * @param mid  电影id
      */
     public void buyMovie(String uid,String mid);
+
+    List<UserAddress> getUserAddressesByUserId(int id);
 
 }

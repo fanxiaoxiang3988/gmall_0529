@@ -58,4 +58,7 @@ public interface CartService {
     CartItem getCartItemInfo(String cartKey, Integer skuId);
 
     void checkItem(Integer skuId, Boolean checkFlag, String tempCartKey, int userId, boolean loginFlag);
+
+    List<CartItem> getCartInfoCheckedList(int id);
+
 }

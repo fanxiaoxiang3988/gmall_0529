@@ -13,6 +13,7 @@ import com.atguigu.gmall.utils.CookieUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
 import java.util.Map;
@@ -127,6 +128,7 @@ public class CartController {
      * @return
      */
     @LoginRequired(needLogin = false)
+    @ResponseBody
     @RequestMapping("/checkItem")
     public String checkItem(Integer skuId,Boolean checkFlag,HttpServletRequest request) {
         //获取用户信息
@@ -140,7 +142,7 @@ public class CartController {
         //判断用户是否登录
         boolean loginFlag = userInfo == null ? false:true;
         cartService.checkItem(skuId,checkFlag,tempCartKey,userId,loginFlag);
-        return "";
+        return "ok";
     }
 
 }
