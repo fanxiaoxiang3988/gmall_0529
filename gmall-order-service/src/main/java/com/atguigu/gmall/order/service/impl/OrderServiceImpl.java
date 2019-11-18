@@ -5,6 +5,8 @@ import com.atguigu.gmall.order.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
+
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -28,7 +30,7 @@ public class OrderServiceImpl implements OrderService {
 
         String token = UUID.randomUUID().toString().replaceAll("-", "");
         Jedis jedis = jedisPool.getResource();
-        jedis.set(token, "fanxiaoxaing");
+        jedis.setex(token, 60*5, "fanxiaoxiang");
         jedis.close();
         return token;
     }
@@ -44,6 +46,16 @@ public class OrderServiceImpl implements OrderService {
         Long del = jedis.del(tradeToken);
         jedis.close();
         return del==1?true:false;
+    }
+
+    /**
+     * 验证库存是否充足
+     * @param userId 当前登录用户的id
+     * @return 所有库存不足的商品的商品id
+     */
+    @Override
+    public List<String> verfyStock(int userId) {
+        return null;
     }
 
 }

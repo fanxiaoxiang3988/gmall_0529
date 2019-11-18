@@ -1,6 +1,7 @@
 package com.atguigu.gmall.order.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.alibaba.fastjson.JSON;
 import com.atguigu.gmall.annotation.LoginRequired;
 import com.atguigu.gmall.order.OrderService;
 import com.atguigu.gmall.order.OrderSubmitVo;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -50,7 +52,14 @@ public class OrderController {
             return "tradeFail";
         }
         //验证库存，库存充足则继续，不足则前往失败页面
-
+        int userId = Integer.parseInt(userInfo.get("id") + "");
+        List<String> stockNotGou = orderService.verfyStock(userId);
+        if(stockNotGou==null || stockNotGou.size()>0) {
+            //令牌失效
+            String string = JSON.toJSONString(stockNotGou);
+            request.setAttribute("errorMsg", "购物车中商品库存不足：" + string);
+            return "tradeFail";
+        }
 
 
         return "list";
