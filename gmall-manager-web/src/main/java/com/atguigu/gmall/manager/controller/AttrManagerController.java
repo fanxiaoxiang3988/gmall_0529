@@ -87,9 +87,9 @@ public class AttrManagerController {
     public String deleteAttrInfoAndValue(Integer id) {
         //log.info("所要删除的平台属性的id为：{}",id);
         //删除平台属性
-        int i = baseAttrInfoService.deleteAttrInfoById(id);
+        baseAttrInfoService.deleteAttrInfoById(id);
         //删除平台属性对应的值
-        int j = baseAttrInfoService.deleteAttrValueInfoById(id);
+        baseAttrInfoService.deleteAttrValueInfoById(id);
 
         return "ok";
     }

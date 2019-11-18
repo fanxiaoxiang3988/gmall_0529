@@ -5,7 +5,6 @@
 		<meta charset="utf-8" />
 		<script src="js/jquery-3.1.1.min.js"></script>
 		<link rel="stylesheet" type="text/css" href="css/JD2.css" />
-
 		<title></title>
 	</head>
 
@@ -21,9 +20,7 @@
 					<li class="header-l-2">
 						<i class="fa fa-map-marker" style="color: #5C5452;"></i>
 						<a href="">北京</a>
-
 					</li>
-
 				</ul>
 				<ul class="header-right">
 					<li th:text="'你好，'+${nickName}"> </li>
@@ -31,11 +28,9 @@
 					<li class="spacer"></li>
 					<li><a href="">我的订单</a></li>
 					<li class="spacer"></li>
-
 				</ul>
 				<div style="clear: both;"></div>
 			</div>
-
 
 		</header>
 
@@ -55,8 +50,6 @@
 				<span>新增收货地址</span>
 			</div>
 
-
-
 			<!--地址-->
 			<div class="top-3">
 				<ul >
@@ -72,7 +65,6 @@
 			<div class="hh1"/></div>
 		<!--********************************************************************************************-->
 
-
 		<!--支付方式-->
 		<h4 class="h4">支付方式</h4>
 
@@ -83,7 +75,6 @@
 		<!--送货清单-->
 		<h4 class="h4" style="margin-top: 5px;">送货清单</h4>
 		<div class="top_1">
-
 			<div class="to_right">
 				<h5>商家：自营</h5>
 				<!--图片-->
@@ -98,10 +89,8 @@
 								<span  >无货</span>
 							</span>
 						</div>
-
 					</div>
 				</div>
-
 		  </div>
 		</div>
 		<div class="bto">
@@ -111,16 +100,11 @@
 			</h4>
 			<br/>
 			<div class="hh3"></div>
-
 		</div>
 		<div class="xia">
 
-
-
 			<div class="yfze">
 				<p class="yfze_a"><span class="z">应付总额：</span><span class="hq" th:text="'￥' + ${tradeInfo.totalPrice}"> ￥99999</span></p>
-
-
 			<button id="submitButton" class="tijiao">提交订单</button>
 		</div>
 		</div>
@@ -130,7 +114,7 @@
 			<input name="deliveryAddress" id="deliveryAddress" type="hidden"/>
 			<input name="paymentWay" id="paymentWay" type="hidden"/>
 			<input name="orderComment" id="orderComment" type="hidden"/>
-			<span  >
+			<span>
 				<input name="orderDetailList[0].skuId'" type="hidden"    value="" />
 				<input name="orderDetailList[0].skuNum'" type="hidden"    value="" />
 				<input name="orderDetailList[0].orderPrice'" type="hidden"    value="" />
@@ -139,7 +123,6 @@
 		</form>
 		<script>
             $(function() {
-
                 $("#submitButton").click(function () {
                    $("#consignee").val($("input[type='radio']:checked").next().text()) ;
                    $("#deliveryAddress").val( $("input[type='radio']:checked").next().next().text());
@@ -147,9 +130,7 @@
                    $("#orderComment").val($("#orderCommentPage").val());
                    console.log($("#orderForm").html());
                    $("#orderForm").submit();
-
                 });
-
 
                 $('.header-right li:nth-of-type(6)').hover(function(){
                     $('.header-r-11').css('display','block')
@@ -177,9 +158,6 @@
                     $('.h-r-1').css('display','none')
                 })
             })
-
-
-
 		</script>
 	</body>
 

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" src="/easyui/jquery.min.js"></script>
+</head>
+<body>
+
+<input type="button" id="test" value="点击测试" onclick="testAjax()"/>
+<div id="myDiv"><h2>Let AJAX change this text</h2></div>
+
+</body>
+<script type="text/javascript">
+
+    function testAjax() {
+        $.ajax({
+            url: 'testAjax',
+            type: 'post',
+            dateType: 'json',
+            data: {},
+            success: function (data) {
+                $("#myDiv").html(data);
+            },
+            error: function () {
+                alert("测试失败...");
+            }
+        })
+    }
+</script>
+</html>
