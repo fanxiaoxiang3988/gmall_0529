@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 /**
- * 购物车结算页封装实体类
+ * 订单提交需要的数据（购物车结算页封装实体类）
  * @author fanrongxiang
  * @email fanxiaoxiang3988@126.com
  * @date 2019/11/14 0014

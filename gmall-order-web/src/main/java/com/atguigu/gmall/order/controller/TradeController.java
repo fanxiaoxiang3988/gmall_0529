@@ -5,6 +5,7 @@ import com.atguigu.gmall.annotation.LoginRequired;
 import com.atguigu.gmall.cart.CartItem;
 import com.atguigu.gmall.cart.CartService;
 import com.atguigu.gmall.cart.CartVo;
+import com.atguigu.gmall.order.OrderService;
 import com.atguigu.gmall.order.TradePageVo;
 import com.atguigu.gmall.user.UserAddress;
 import com.atguigu.gmall.user.UserService;
@@ -28,7 +29,14 @@ public class TradeController {
     private CartService cartService;
     @Reference
     private UserService userService;
+    @Reference
+    private OrderService orderService;
 
+    /**
+     * 在购物车结算页用户点击去结算，获取商品信息并跳转到结算页面
+     * @param request
+     * @return
+     */
     @LoginRequired
     @RequestMapping("/trade")
     public String trade(HttpServletRequest request) {
@@ -48,7 +56,9 @@ public class TradeController {
         vo.setCartItems(cartItemList);
         vo.setTotalPrice(totalPrice);
         request.setAttribute("tradeInfo", vo);
-        //防止重复提交
+        //防止重复提交，生成一个令牌，服务器一份，页面一份，用于比较
+        String token = orderService.createTradeToken();//创建一个交易令牌，服务端也保存了
+        request.setAttribute("token",token);
         return "trade";
     }
 
