@@ -1,5 +1,6 @@
 package com.atguigu.gmall.order;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -13,5 +14,5 @@ public interface OrderService {
 
     boolean verfyToken(String tradeToken);
 
-    List<String> verfyStock(int userId);
+    List<String> verfyStock(int userId) throws IOException;
 }

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -40,7 +41,7 @@ public class OrderController {
      */
     @LoginRequired
     @RequestMapping("/submitOrder")
-    public String submitOrder(OrderSubmitVo submitVo, HttpServletRequest request) {
+    public String submitOrder(OrderSubmitVo submitVo, HttpServletRequest request) throws IOException {
         Map<String, Object> userInfo = (Map<String, Object>) request.getAttribute("userInfo");
         log.info("当前的用户信息是:{}", userInfo);
         log.info("页面收到的数据是：{}", submitVo);
@@ -54,14 +55,12 @@ public class OrderController {
         //验证库存，库存充足则继续，不足则前往失败页面
         int userId = Integer.parseInt(userInfo.get("id") + "");
         List<String> stockNotGou = orderService.verfyStock(userId);
-        if(stockNotGou==null || stockNotGou.size()>0) {
+        if(stockNotGou!=null || stockNotGou.size()>0) {
             //令牌失效
             String string = JSON.toJSONString(stockNotGou);
             request.setAttribute("errorMsg", "购物车中商品库存不足：" + string);
             return "tradeFail";
         }
-
-
         return "list";
     }
 
