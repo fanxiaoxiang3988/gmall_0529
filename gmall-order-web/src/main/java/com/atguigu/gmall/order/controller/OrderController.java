@@ -45,7 +45,7 @@ public class OrderController {
         Map<String, Object> userInfo = (Map<String, Object>) request.getAttribute("userInfo");
         log.info("当前的用户信息是:{}", userInfo);
         log.info("页面收到的数据是：{}", submitVo);
-        //验证令牌是否失效，成功继续执行，失效则前往错误页面
+        //验证令牌是否失效，成功继续执行，失效则前往错误页面（防重复提交）
         boolean token = orderService.verfyToken(submitVo.getTradeToken());
         if(!token) {
             //令牌失效
@@ -61,6 +61,10 @@ public class OrderController {
             request.setAttribute("errorMsg", "购物车中商品库存不足：" + string);
             return "tradeFail";
         }
+        //以上都没错，下单
+
+
+
         return "list";
     }
 
