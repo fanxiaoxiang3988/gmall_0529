@@ -9,6 +9,9 @@ import java.util.Date;
 import java.util.List;
 
 /**
+ * 对于订单的详细信息并没有太多的存储
+ * 具体信息都在OrderDetail表中
+ * 多个OrderDetail表组成了一个OrderInfo表
  * @author fanrongxiang
  * @email fanxiaoxiang3988@126.com
  * @date 2019/11/20 0020

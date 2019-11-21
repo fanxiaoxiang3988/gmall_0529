@@ -1,4 +1,4 @@
-package com.atguigu.gmall.cart.constent;
+package com.atguigu.gmall.constent;
 
 /**
  * @author fanrongxiang

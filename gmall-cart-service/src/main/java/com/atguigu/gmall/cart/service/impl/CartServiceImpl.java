@@ -3,16 +3,14 @@ package com.atguigu.gmall.cart.service.impl;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.dubbo.config.annotation.Service;
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.atguigu.gmall.cart.CartItem;
 import com.atguigu.gmall.cart.CartService;
 import com.atguigu.gmall.cart.CartVo;
 import com.atguigu.gmall.cart.SkuItem;
-import com.atguigu.gmall.cart.constent.CartConstant;
+import com.atguigu.gmall.constent.CartConstant;
 import com.atguigu.gmall.manager.SkuService;
 import com.atguigu.gmall.manager.sku.SkuInfo;
 import org.apache.commons.lang3.StringUtils;
-import org.omg.PortableServer.LIFESPAN_POLICY_ID;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import redis.clients.jedis.Jedis;
@@ -20,7 +18,6 @@ import redis.clients.jedis.JedisPool;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 /**

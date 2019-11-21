@@ -3,8 +3,11 @@ package com.atguigu.gmall.order.controller;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.fastjson.JSON;
 import com.atguigu.gmall.annotation.LoginRequired;
+import com.atguigu.gmall.order.OrderInfoTo;
 import com.atguigu.gmall.order.OrderService;
 import com.atguigu.gmall.order.OrderSubmitVo;
+import com.atguigu.gmall.user.UserAddress;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -55,15 +58,22 @@ public class OrderController {
         //验证库存，库存充足则继续，不足则前往失败页面
         int userId = Integer.parseInt(userInfo.get("id") + "");
         List<String> stockNotGou = orderService.verfyStock(userId);
-        if(stockNotGou!=null || stockNotGou.size()>0) {
+        if(stockNotGou!=null && stockNotGou.size()>0) {
             //令牌失效
             String string = JSON.toJSONString(stockNotGou);
             request.setAttribute("errorMsg", "购物车中商品库存不足：" + string);
             return "tradeFail";
         }
-        //以上都没错，下单
-
-
+        //封装一些订单中用户收货的信息，便于订单生成
+        OrderInfoTo orderInfoTo = new OrderInfoTo();
+        orderInfoTo.setOrderComment(submitVo.getOrderComment());
+        Integer userAddressId = submitVo.getUserAddressId();
+        UserAddress userAddress = orderService.getUserAddressById(userAddressId);
+        orderInfoTo.setConsignee(userAddress.getConsignee());
+        orderInfoTo.setConsigneeTel(userAddress.getPhoneNum());
+        orderInfoTo.setDeliveryAddress(userAddress.getUserAddress());
+        //以上都没错,下单
+        orderService.createOrder(userId,orderInfoTo);
 
         return "list";
     }
