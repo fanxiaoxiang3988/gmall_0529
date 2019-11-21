@@ -177,7 +177,6 @@ public class OrderServiceImpl implements OrderService {
                 newfieldOrder.add(id);
             }
         }
-
             //重新设置fieldOrder字段
         jedis.hset(CartConstant.USER_CART_PREFIX+userId,"fieldOrder",JSON.toJSONString(newfieldOrder));
         jedis.close();
