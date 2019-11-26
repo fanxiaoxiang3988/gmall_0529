@@ -26,6 +26,8 @@
         <module>gmall-passport-web</module>
         <module>gmall-cart-service</module>
         <module>gmall-cart-web</module>
+        <module>gmall-order-service</module>
+        <module>gmall-order-web</module>
     </modules>
     <packaging>pom</packaging>
     <description>这是一个聚合工程</description>

@@ -113,9 +113,10 @@ public class OrderServiceImpl implements OrderService {
      * 创建订单
      * @param userId 用户的id
      * @param orderInfoTo 订单的备注、收货人等信息
+     * @return 订单的信息
      */
     @Override
-    public void createOrder(int userId, OrderInfoTo orderInfoTo) {
+    public OrderInfo createOrder(int userId, OrderInfoTo orderInfoTo) {
         //1、查出该用户id对应redis中存储的所有结算商品
         List<CartItem> cartItems = cartService.getCartInfoCheckedList(userId);
         CartVo cartVo = new CartVo();
@@ -138,8 +139,11 @@ public class OrderServiceImpl implements OrderService {
             //设置对外业务号
         orderInfo.setOutTradeNo("ATGUIGU_" + System.currentTimeMillis() + "_" + userId);
         orderInfo.setTotalAmount(totalPrice);
+            //加上订单描述;默认是第一个商品的名字
+        orderInfo.setTradeBody(cartItems.get(0).getSkuItem().getSkuName());
         orderInfoMapper.insert(orderInfo);
         //3、向OrderDetail表循环插入数据（多个OrderDetail表可以汇总成一张OrderInfo表）
+        List<OrderDetail> orderDetailList = new ArrayList<>();
         for (CartItem cartItem : cartItems) {
             SkuItem skuItem = cartItem.getSkuItem();
             OrderDetail orderDetail = new OrderDetail();
@@ -150,13 +154,15 @@ public class OrderServiceImpl implements OrderService {
             orderDetail.setSkuName(skuItem.getSkuName());
             orderDetail.setSkuNum(cartItem.getNum());
             orderDetailMapper.insert(orderDetail);
+            orderDetailList.add(orderDetail);
         }
+        orderInfo.setOrderDetailList(orderDetailList);
         //4、删除购物车中这些商品的数据
         Jedis jedis = jedisPool.getResource();
         String[] delStrIds = new String[cartItems.size()];
         for (int i = 0; i < cartItems.size(); i++) {
             delStrIds[i] = cartItems.get(i).getSkuItem().getId()+"";
-    }
+        }
         jedis.hdel(CartConstant.USER_CART_PREFIX+userId ,delStrIds);
         //5、修改购物车中关于存储顺序的fieldOrder字段
             //先查出之前的fieldOrder字段
@@ -180,6 +186,7 @@ public class OrderServiceImpl implements OrderService {
             //重新设置fieldOrder字段
         jedis.hset(CartConstant.USER_CART_PREFIX+userId,"fieldOrder",JSON.toJSONString(newfieldOrder));
         jedis.close();
+        return orderInfo;
     }
 
 

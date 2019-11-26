@@ -37,7 +37,7 @@ public class OrderInfo extends SuperBean {
 
     private Date expireTime;  //过期时间
 
-
+    private String tradeBody;//订单描述
 
     private String orderComment; //订单备注
 

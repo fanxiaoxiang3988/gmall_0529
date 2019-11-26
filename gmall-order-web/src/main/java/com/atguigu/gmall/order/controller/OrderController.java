@@ -3,15 +3,15 @@ package com.atguigu.gmall.order.controller;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.fastjson.JSON;
 import com.atguigu.gmall.annotation.LoginRequired;
+import com.atguigu.gmall.order.OrderInfo;
 import com.atguigu.gmall.order.OrderInfoTo;
 import com.atguigu.gmall.order.OrderService;
 import com.atguigu.gmall.order.OrderSubmitVo;
 import com.atguigu.gmall.user.UserAddress;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
-
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.List;
@@ -44,7 +44,7 @@ public class OrderController {
      */
     @LoginRequired
     @RequestMapping("/submitOrder")
-    public String submitOrder(OrderSubmitVo submitVo, HttpServletRequest request) throws IOException {
+    public String submitOrder(OrderSubmitVo submitVo, HttpServletRequest request, Model model) throws IOException {
         Map<String, Object> userInfo = (Map<String, Object>) request.getAttribute("userInfo");
         log.info("当前的用户信息是:{}", userInfo);
         log.info("页面收到的数据是：{}", submitVo);
@@ -73,9 +73,25 @@ public class OrderController {
         orderInfoTo.setConsigneeTel(userAddress.getPhoneNum());
         orderInfoTo.setDeliveryAddress(userAddress.getUserAddress());
         //以上都没错,下单
-        orderService.createOrder(userId,orderInfoTo);
+        OrderInfo info = null;
+        try {
+            info = orderService.createOrder(userId,orderInfoTo);
+        } catch (Exception e) {
+            request.setAttribute("errorMsg", "网络异常..." + e.getMessage());
+            e.printStackTrace();
+            return "tradeFail";
+        }
+        /**
+         * model.addAttribute()，如果是转发，则是放在请求域中，如果是重定向，内容会拼接在url地址中
+         * 将支付宝生成订单时所需要的信息，放在请求域中
+         * <input name="out_trade_no" type="hidden" /><br/>
+         * <input name="subject" type="hidden" /><br/>
+         * <input name="total_amount" type="hidden" /><br/>
+         * <input name="body" type="hidden" /><br/>
+         */
+        model.addAttribute("orderInfo", info);
 
-        return "list";
+        return "paymentPage";
     }
 
 
