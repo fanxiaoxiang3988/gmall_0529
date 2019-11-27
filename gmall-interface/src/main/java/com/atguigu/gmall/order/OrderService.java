@@ -21,4 +21,6 @@ public interface OrderService {
     UserAddress getUserAddressById(Integer userAddressId);
 
     OrderInfo createOrder(int userId, OrderInfoTo orderInfoTo);
+
+    OrderInfo getOrderById(Integer id);
 }

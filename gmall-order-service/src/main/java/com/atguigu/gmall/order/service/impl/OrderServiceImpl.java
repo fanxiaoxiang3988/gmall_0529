@@ -189,6 +189,11 @@ public class OrderServiceImpl implements OrderService {
         return orderInfo;
     }
 
+    @Override
+    public OrderInfo getOrderById(Integer id) {
+        return orderInfoMapper.selectById(id);
+    }
+
 
     /**
      * 根据商品id和所需数量，查询库存是否足够

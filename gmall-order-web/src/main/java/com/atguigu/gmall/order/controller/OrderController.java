@@ -94,5 +94,9 @@ public class OrderController {
         return "paymentPage";
     }
 
+    @RequestMapping("/list")
+    public String orderList(){
+        return "list";
+    }
 
 }

@@ -55,8 +55,6 @@ public class OrderInfo extends SuperBean {
     @TableField(exist = false)
     private List<OrderInfo> orderSubList; //子订单
 
-    private String wareId;
-
     private String outTradeNo;  //对外交易号；对接支付宝
 
 }
