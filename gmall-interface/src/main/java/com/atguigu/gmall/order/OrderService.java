@@ -23,4 +23,6 @@ public interface OrderService {
     OrderInfo createOrder(int userId, OrderInfoTo orderInfoTo);
 
     OrderInfo getOrderById(Integer id);
+
+    void updateOrderPaySuccess(String out_trade_no);
 }

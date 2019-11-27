@@ -13,6 +13,7 @@ import com.atguigu.gmall.order.mapper.OrderDetailMapper;
 import com.atguigu.gmall.order.mapper.OrderInfoMapper;
 import com.atguigu.gmall.order.mapper.UserAddressMapper;
 import com.atguigu.gmall.user.UserAddress;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -192,6 +193,22 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderInfo getOrderById(Integer id) {
         return orderInfoMapper.selectById(id);
+    }
+
+    /**
+     * 将订单状态改为支付成功
+     * @param out_trade_no
+     */
+    @Override
+    public void updateOrderPaySuccess(String out_trade_no) {
+
+        UpdateWrapper<OrderInfo> orderInfoUpdateWrapper = new UpdateWrapper<>();
+        orderInfoUpdateWrapper.eq("out_trade_no", out_trade_no);
+        OrderInfo orderInfo = new OrderInfo();
+        orderInfo.setProcessStatus(ProcessStatus.PAID);
+        orderInfo.setOrderStatus(OrderStatus.PAID);
+        orderInfoMapper.update(orderInfo, orderInfoUpdateWrapper);
+
     }
 
 
