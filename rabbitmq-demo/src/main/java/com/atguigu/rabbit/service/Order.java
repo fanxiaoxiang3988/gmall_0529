@@ -1,7 +1,6 @@
 package com.atguigu.rabbit.service;
 
 import lombok.Data;
-
 import java.io.Serializable;
 import java.math.BigDecimal;
 

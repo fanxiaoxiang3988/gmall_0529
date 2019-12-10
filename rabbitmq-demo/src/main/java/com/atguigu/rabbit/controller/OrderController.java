@@ -16,7 +16,7 @@ import java.util.UUID;
  * @email fanxiaoxiang3988@126.com
  * @date 2019/12/3 0003
  */
-@RestController
+//@RestController
 public class OrderController {
 
     @Autowired
