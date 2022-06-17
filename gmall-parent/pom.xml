@@ -28,7 +28,7 @@
         <java.version>1.8</java.version>
 
         <!--主要是为了方便管理jar包的版本号，让整个工程统一jar的版本-->
-        <fastjson.version>1.2.46</fastjson.version>
+        <fastjson.version>1.2.83</fastjson.version>
         <dubbo-starter.version>0.1.1</dubbo-starter.version>
         <dubbo.version>2.6.2</dubbo.version>
         <zkclient.version>0.10</zkclient.version>
